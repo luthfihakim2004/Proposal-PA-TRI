@@ -11,53 +11,237 @@
 \end{figure}
 
 \section{Alat dan Bahan}
-\lipsum[2][4]
+
+Pengerjaan proyek ini dilakukan dengan menggunakan perangkat keras dan perangkat lunak yang sesuai dengan kebutuhan dalam perancangan sistem. Perangkat-perangkat keras yang digunakan antara lain:
 
 \begin{enumerate}
-    \item \lipsum[2][5]
-    \item \lipsum[2][5]
-    \item \lipsum[2][5]
+    \item Laptop \\ Pada pengerjaan proyek ini, laptop berfungsi sebagai perangkat utama dalam perancangan sistem sekaligus pengujian sistem. Laptop yang digunakan memiliki spesifikasi sebagaimana yang dimuat pada Tabel 3.1.
+    \item SSD
+\end{enumerate}
+
+Adapun perangkat lunak yang digunakan pada proyek ini, berjalan pada perangkat keras yang digunakan dan berfungsi sebagai komponen utama dalam perancangan sistem. Perangkat-perangkat lunak yang digunakan meliputi:
+
+\begin{enumerate}
+    \item Linux Kernel 5.6+
+    \item FUSE 3.10+ (API FUSE versi 35+)
+    \item OpenSSL 3.0+
+    \item libargon2
+    \item C++20
+    \item Neovim
+    \item Git
+    \item CMake 3.21+
+    \item Perf 
+    \item fio 
+    \item hyperfine
 \end{enumerate}
 
 \section{Tahapan Penelitian}
-\lipsum[2][4]
+
+Penelitian ini dilakukan secara sistematis dan terbagi dalam empat tahapan, diantaranya adalah perencanaan, perancangan sistem, pengujian sistem dan pengumpulan data, dan pengolahan data dan penyusunan laporan. Rincian tahapan penelitian ini dimuat dalam diagram alir (flowchart) pada gambar 3.2.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.40\linewidth]{gambar/flowchart.png}
+    \caption{Contoh gambar 3}
+    \label{gambar3}
+\end{figure}
+
+Berdasarkan flowchart tahapan penelitian diatas, berikut uraian dari masing-masing tahapan:
 
 \begin{enumerate}
-    \item \lipsum[2][5] \\ \lipsum[3]
-    \item \lipsum[2][5] \\ \lipsum[3]
-    \item \lipsum[2][5] \\ \lipsum[3]
-    \item \lipsum[2][5] \\ \lipsum[3]
+    \item Perencanaan \\ Tahap pertama yang dilakukan dalam penelitian ini adalah perencanaan yang dimulai dari mengidentifikasi permasalahan yang menjadi latar belakang penelitian ini dilaksanakan. Kemudian dilakukan studi literatur untuk mengkaji dan mempelajari penelitian yang telah dilakukan beserta solusi yang telah diajukan. Hasil dari studi literatur menjadi dasar pertimbangan dalam perancangan sistem yang akan dilakukan dalam penelitian ini. Hasil dari tahapan ini berupa rumusan masalah, batasan masalah, hipotesis, serta rincian alat dan bahan yang akan digunakan dalam penelitian ini.
+    \item Perancangan Sistem \\ Tahap perancangan sistem terdiri dari beberapa rincian tahapan yang diperlukan untuk memastikan sistem yang dibangun berjalan sebagaimana mestinya. Rincian tahapan yang dilakukan adalah sebagai berikut:
+        \begin{enumerate}
+            \item Perencanaan Arsitektur \\ Perencanaan bla bla bla
+            \item Perencanaan Arsitektur \\ Perencanaan bla bla bla
+        \end{enumerate}
+    \item Pengujian Sistem dan Pengumpulan Data \\ \lipsum[3]
+    \item Pengolahan Data dan Penyusunan Laporan \\ \lipsum[3]
 \end{enumerate}
 
 \section{Perancangan Sistem}
-\subsection{Sub Perancangan Sistem I}
+\subsection{Arsitektur Sistem}
+
+Sistem terdiri dari tiga mode, yaitu:
+
+\begin{enumerate}
+    \item Inisialisasi \\ Pada mode ini, pengguna menenentukan direktori yang akan digunakan sistem berkas pengguna (FUSE) sekaligus menghasilkan file konfigurasi yang disimpan di dalam direktori tersebut.
+    \item Mounting Filesystem \\ Mode utama yang digunakan setelah menentukan direktori yang digunakan dan file konfigurasi (.leichfs.conf) ditemukan.
+    \item Pergantian Master Key \\ Mode ini digunakan untuk mengubah Master Key yang tersimpan dalam file konfigurasi.
+\end{enumerate}
+
+\subsection{Manajemen Kunci}
+
+Sistem menggunakan tiga level kunci untuk bekerja. Ketiga kunci yang dimaksud adalah sebagai berikut
+
+\begin{table}[H]
+    \centering
+    \caption{Daftar kunci yang digunakan pada sistem}
+    \label{t:tabel-kunci-sistem}
+
+    \begin{tabularx}{\textwidth}{|
+        >{\centering\arraybackslash}p{1cm}|
+        >{\arraybackslash}p{4cm}|
+        >{\arraybackslash}X|}
+        \hline
+
+        \rowcolor[HTML]{C0C0C0}
+        \textbf{Level}
+        & \textbf{Kunci}
+        & \textbf{Fungsi} \\
+        \hline
+
+        1
+        & Wrapping Key (KEK)
+        & Digunakan untuk membungkus (wrap) Master Key.
+          KEK diturunkan melalui Argon2id dari passphrase
+          dan salt yang tersimpan di
+          \texttt{.leichfs.conf} pada setiap proses inisialisasi
+          atau mount. Bersifat ephemeral dan dihapus (zeroization) setelah
+          digunakan. \\
+        \hline
+
+        2
+        & Master Key
+        & Merupakan kunci utama yang digunakan sebagai dasar
+          pembentukan File Key. Master Key dibangkitkan satu kali
+          melalui \texttt{getrandom(2)} pada saat inisialisasi
+          dan disimpan dalam keadaan terenkripsi (wrapped) menggunakan
+          AES-256-GCM di \texttt{.leichfs.conf}. \\
+        \hline
+
+        3
+        & File Key
+        & Digunakan untuk mengenkripsi dan mendekripsi berkas.
+          File Key diturunkan melalui HKDF-SHA256
+          dari Master Key dengan \texttt{file\_salt} yang tersimpan
+          pada file header. File Key dibuat untuk masing-masing berkas
+          dan disimpan secara efemeral di \texttt{FH::file\_key}
+          saat \texttt{open()} lalu dihapus (zeroization) saat
+          \texttt{close()}. \\
+        \hline
+
+    \end{tabularx}
+\end{table}
+
+Kombinasi dari ketiga kunci tersebut membentuk pengamanan berkas melalui metode Envelope Encryption. Metode ini mengamankan data dengan menggunakan dua lapis kunci secara bersamaan 
+
+\subsection{Format Penyimpanan Berkas}
+
+Penyimpanan berkas pada sistem dilakukan dengan menambahkan header untuk masing-masing berkas yang terenkripsi. Setiap berkas juga dipecah menjadi sejumlah bagian yang disebut chunk dengan ukuran 65.536 byte. Seluruh chunk dari satu berkas diproses oleh sistem satu-persatu. Adapun detail struktur header adalah sebagai berikut:
+
+\begin{table}[H]
+    \centering
+    \caption{Header yang digunakan pada sistem}
+    \label{t:tabel-header-sistem}
+
+    \begin{tabularx}{\textwidth}{|
+        >{\centering\arraybackslash}p{1.5cm}|
+        >{\centering\arraybackslash}p{2cm}|
+        >{\centering\arraybackslash}p{3cm}|
+        >{\centering\arraybackslash}p{2.5cm}|
+        >{\arraybackslash}X|}
+        \hline
+
+        \rowcolor[HTML]{C0C0C0}
+        \textbf{Offset}
+        & \textbf{Size}
+        & \textbf{Field}
+        & \textbf{Type}
+        & \textbf{Description} \\
+        \hline
+
+        0
+        & 8 Bytes
+        & \texttt{magic}
+        & \texttt{uint8\_t[8]}
+        & Identitas file dengan nilai \texttt{"LEICHFSX"}. \\
+        \hline
+
+        8
+        & 4 Bytes
+        & \texttt{version}
+        & \texttt{uint32\_t}
+        & Versi format file. Saat ini bernilai 1. \\
+        \hline
+
+        12
+        & 4 Bytes
+        & \texttt{chunk\_sz}
+        & \texttt{uint32\_t}
+        & Jumlah byte plaintext dalam setiap chunk. \\
+        \hline
+
+        16
+        & 16 Bytes
+        & \texttt{salt}
+        & \texttt{uint8\_t[16]}
+        & Salt acak per-file yang digunakan dalam proses HKDF. \\
+        \hline
+
+        32
+        & 24 Bytes
+        & \texttt{reserved}
+        & \texttt{uint8\_t[24]}
+        & Ruang yang dicadangkan untuk pengembangan format pada masa mendatang dan saat ini diisi dengan nilai nol. \\
+        \hline
+
+        56
+        & 8 Bytes
+        & \texttt{plain\_len\_be}
+        & \texttt{uint64\_t}
+        & Ukuran total plaintext dalam byte dalam representasi kanonis. \\
+        \hline
+
+    \end{tabularx}
+\end{table}
+
+Setiap chunk pada file diverifikasi melalui Additional Authentication Data (AAD). AAD merupakan kumpulan data unik yang digunakan untuk memverifikasi integritas data yang dienkripsi. Penggunaan AAD dalam kasus ini berperan untuk memverifikasi setiap chunk dari berkas. AAD yang digunakan tersusun dari data sepanjang 40 byte dengan rincian sebagai berikut:
+
+\begin{itemize}
+    \item magic
+    \item version
+    \item chunk\_sz
+    \item salt
+    \item chunk\_id
+\end{itemize}
+
+Dengan demikian, penggunaan AAD mengikat setiap chunk sesuai dengan urutannya pada berkas.
+
+Adanya penambahan data pada berkas yang terenkripsi tentunya menimbulkan perbedaan ukuran berkas asli dengan berkas yang telah terenkripsi. Perbedaan ini dapat dihitung berdasarkan selisih antara ukuran data asli (plaintext) dan ukuran data setelah dienkripsi (ciphertext). 
+
+\subsection{Alur Operasi Read-Write}
 \lipsum[2]
 
-\subsection{Sub Perancangan Sistem II}
+\subsection{Manajemen Akses}
+\lipsum[2]
+
+\subsection{Modul Internal}
 \lipsum[2]
 
 \begin{table}[H]
     \centering
     \caption{Contoh tabel 2}
-    \label{t perbandinganRespon}
+    \label{t-perbandinganRespon}
     \begin{tabular}{lllll}
         \hline
-        \multirow{2}{*}{Karakteristik} & \multicolumn{4}{c}{Perbandingan performa} \\ \cline{2-5} 
-        & \multicolumn{1}{c}{\textbf{PID}} & \multicolumn{1}{c}{\textbf{MF3}} & \multicolumn{1}{c}{\textbf{MF5}} & \multicolumn{1}{c}{\textbf{MF7}} \\ \hline
-        \textit{Rise time} (s)  & 1,0580  & 1,0740  & 1,0620    & \textbf{1,0450} \\
-        \textit{Settling time} (s) & 1,3380 & 1,3410  & 1,3350  & \textbf{1,3290} \\
-        \textit{Overshoot} (\%) & 0,0910 & 0,0440  & 0,0593     & \textbf{0,0121} \\
-        \textit{Peak} & 1,0910 & 1,0440 & 1,0593 & \textbf{1,0121} \\
-        \textit{Peak time} (s) & 1,0840 & 1,3560  & 1,2710      & 1,0520  \\ \hline
+        \multirow{2}{*}{Karakteristik} & \multicolumn{4}{c}{Perbandingan performa} \\ 
+        \cline{2-5}
+        & \multicolumn{1}{c}{\textbf{PID}} 
+        & \multicolumn{1}{c}{\textbf{MF3}} 
+        & \multicolumn{1}{c}{\textbf{MF5}} 
+        & \multicolumn{1}{c}{\textbf{MF7}} \\ 
+        \hline
+        
+        \textit{Rise time} (s)     & 1,0580 & 1,0740 & 1,0620 & \textbf{1,0450} \\
+        \textit{Settling time} (s) & 1,3380 & 1,3410 & 1,3350 & \textbf{1,3290} \\
+        \textit{Overshoot} (\%)    & 0,0910 & 0,0440 & 0,0593 & \textbf{0,0121} \\
+        \textit{Peak}              & 1,0910 & 1,0440 & 1,0593 & \textbf{1,0121} \\
+        \textit{Peak time} (s)     & 1,0840 & 1,3560 & 1,2710 & 1,0520 \\ 
+        \hline
     \end{tabular}
 \end{table}
 
-\lipsum[2]
-
-\subsection{Sub Perancangan Sistem III}
-\lipsum[2]
-
-\subsection{Sub Perancangan Sistem IV}
 \lipsum[2]
 
 \section{Pengambilan Data}
@@ -66,26 +250,30 @@
 \begin{table}[H]
     \centering
     \caption{Contoh tabel 3}
-    \label{t bestfits}
+    \label{t-bestfits}
     \begin{tabular}{|
-        >{\columncolor[HTML]{EFEFEF}}c 
-        >{\columncolor[HTML]{C0C0C0}}c |
-        >{\columncolor[HTML]{FFFFFF}}c 
-        >{\columncolor[HTML]{FFFFFF}}c 
-        >{\columncolor[HTML]{FFFFFF}}c 
-        >{\columncolor[HTML]{FFFFFF}}c 
-        >{\columncolor[HTML]{FFFFFF}}c 
-        >{\columncolor[HTML]{FFFFFF}}c |
-    }
+        >{\columncolor[HTML]{C0C0C0}}c|
+        *{6}{>{\columncolor[HTML]{FFFFFF}}c|}}
         \hline
-        \multicolumn{2}{|c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{000000} }} & \multicolumn{6}{c|}{\cellcolor[HTML]{EFEFEF}\textit{Validation data}} \\ \cline{3-8} 
-        \multicolumn{2}{|c|}{\multirow{-2}{*}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{000000} }}} & \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}{\color[HTML]{333333} Data-1}} & \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}{\color[HTML]{333333} Data-2}} & \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}{\color[HTML]{333333} Data-3}} & \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}{\color[HTML]{333333} Data-4}} & \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}{\color[HTML]{333333} Data-5}} & \cellcolor[HTML]{C0C0C0}{\color[HTML]{333333} Data 6} \\ \hline
-        \multicolumn{1}{|c|}{\cellcolor[HTML]{EFEFEF}} & {\color[HTML]{333333} $TF_{1}$} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 83,13}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 77,73}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 80,74}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 94,22}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 85,88}} & {\color[HTML]{333333} 83,76}                         \\ \cline{2-8} 
-        \multicolumn{1}{|c|}{\cellcolor[HTML]{EFEFEF}}                                        & {\color[HTML]{333333} $TF_{2}$} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 79,61}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 83,34}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 76,93}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 84,3}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 82,39}} & {\color[HTML]{333333} 77,31}                         \\ \cline{2-8} 
-        \multicolumn{1}{|c|}{\cellcolor[HTML]{EFEFEF}}                                        & {\color[HTML]{333333} $TF_{3}$} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 81,88}}  & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 72,91}}  & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 82,17}}  & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 95,17}}  & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 84,9}}  & {\color[HTML]{333333} 81,9}                          \\ \cline{2-8} 
-        \multicolumn{1}{|c|}{\cellcolor[HTML]{EFEFEF}}                                        & {\color[HTML]{333333} $TF_{4}$} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 82,6}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 73,58}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 81,63}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 96,21}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 85,44}} & {\color[HTML]{333333} 84,23}                         \\ \cline{2-8} 
-        \multicolumn{1}{|c|}{\cellcolor[HTML]{EFEFEF}}                                        & {\color[HTML]{333333} $TF_{5}$} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 83,13}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 77,33}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 80,95}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 94,59}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 85,89}} & {\color[HTML]{333333} 83,87}                         \\ \cline{2-8} 
-        \multicolumn{1}{|c|}{\multirow{-6}{*}{\cellcolor[HTML]{EFEFEF}\begin{tabular}[c]{@{}c@{}}\rotatebox[origin=c]{90}{\textit{\textit{Transfer function}}}\end{tabular}}} & {\color[HTML]{333333} $TF_{6}$} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 83,56}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 73,29}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 81,42}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 96,17}} & \multicolumn{1}{c|}{\cellcolor[HTML]{FFFFFF}{\color[HTML]{333333} 85,4}} & {\color[HTML]{333333} 84,33}                         \\ \hline
+        
+        \diagbox[
+            width=5cm,
+            height=1.5cm
+        ]{\textit{Transfer Function}}{\textit{Validation Data}}
+        & \cellcolor[HTML]{C0C0C0}\textbf{Data-1}
+        & \cellcolor[HTML]{C0C0C0}\textbf{Data-2}
+        & \cellcolor[HTML]{C0C0C0}\textbf{Data-3}
+        & \cellcolor[HTML]{C0C0C0}\textbf{Data-4}
+        & \cellcolor[HTML]{C0C0C0}\textbf{Data-5}
+        & \cellcolor[HTML]{C0C0C0}\textbf{Data-6} \\
+        \hline
+        
+        \cellcolor[HTML]{EFEFEF}$TF_{1}$ & 83,13 & 77,73 & 80,74 & 94,22 & 85,88 & 83,76 \\ \hline
+        \cellcolor[HTML]{EFEFEF}$TF_{2}$ & 79,61 & 83,34 & 76,93 & 84,30 & 82,39 & 77,31 \\ \hline
+        \cellcolor[HTML]{EFEFEF}$TF_{3}$ & 81,88 & 72,91 & 82,17 & 95,17 & 84,90 & 81,90 \\ \hline
+        \cellcolor[HTML]{EFEFEF}$TF_{4}$ & 82,60 & 73,58 & 81,63 & 96,21 & 85,44 & 84,23 \\ \hline
+        \cellcolor[HTML]{EFEFEF}$TF_{5}$ & 83,13 & 77,33 & 80,95 & 94,59 & 85,89 & 83,87 \\ \hline
+        \cellcolor[HTML]{EFEFEF}$TF_{6}$ & 83,56 & 73,29 & 81,42 & 96,17 & 85,40 & 84,33 \\ \hline
     \end{tabular}
 \end{table}
 

@@ -1,24 +1,113 @@
-\chapter[Landasan Teori]{\\ Landasan Teori}
+\chapter[Kajian Pustaka]{\\ Kajian Pustaka}
 
 \section{Tinjauan Pustaka}
-\lipsum[2]
+Literatur mengenai metode pengamanan pada sistem berkas telah berkembang pesat seiring berjalannya waktu.
+
+Berdasarkan ... , pengembangan sistem berkas berbasis kernel dinilai sulit karena tingginya kompleksitas
+
+Penelitian lain yang berfokus pada ... menunjukkan bahwa
+
 
 \section{Dasar Teori}
-\subsection{Sub Dasar Teori I}
-\lipsum[2]
+Landasan teori pada penelitian ini disusun sebagai dasar dalam pengembangan implementasi sistem berkas ruang pengguna terenkripsi menggunakan Filesystem in Userspace (FUSE). Pemahaman terhadap konsep FUSE menjadi poin penting dalam menyusun mekanisme intersepsi operasi berkas pada level ruang pengguna, sehingga proses enkripsi dan dekripsi data dapat dilakukan secara transparan tanpa memerlukan modifikasi pada kernel sistem operasi. Pemahaman mengenai konsep kriptografi, khususnya Advanced Encryption Standard (AES) sebagai algoritma enkripsi simetris, serta Argon2id dan HKDF sebagai mekanisme turunan kunci (key derivation), juga diperlukan untuk mendukung proses implementasi dan evaluasi keamanan sistem yang dibangun pada penelitian ini.
 
-\subsection{Sub Dasar Teori II}
-\lipsum[2]
+Penelitian ini juga mengacu pada teori mengenai prinsip dasar kriptografi sebagai landasan dalam menjamin kerahasiaan (confidentiality) data yang disimpan pada media penyimpanan. Parameter keamanan seperti kekuatan kunci, ketahanan terhadap serangan brute-force, serta efisiensi proses enkripsi dan dekripsi menjadi aspek penting dalam mengevaluasi kualitas sistem berkas terenkripsi yang dibangun. Dengan mengacu pada teori-teori yang relevan, penelitian ini bertujuan untuk menghasilkan sistem berkas ruang pengguna yang tidak hanya mampu mengamankan data secara transparan, tetapi juga dapat memberikan analisis performa dan keamanan yang sesuai untuk implementasi pengamanan pada media penyimpanan data berbasis FUSE.
+
+\subsection{Filesystem in Userspace}
+Filesystem in Userspace (FUSE) merupakan kerangka kerja yang memungkinkan implementasi sistem berkas di ruang pengguna (userspace) alih-alih di dalam kernel sistem operasi\cite{Rietveld2022Opleiding}. Pendekatan arsitektur ini dipilih sebagai solusi alternatif atas tingginya kompleksitas tradisional dan ketatnya barrier to entry pada pengembangan filesystem berbasis kernel, yang menuntut akurasi ekstrem terhadap stabilitas sistem serta keamanan kode\cite{ChoRFUSE}. Dengan memindahkan logika filesystem ke userspace, FUSE memudahkan proses pengembangan, debugging, pemeliharaan, dan prototyping, sekaligus memberi akses pada pustaka userspace dan meningkatkan portabilitas\cite{Lembke2022DEFUSE:}.
+
+Secara arsitektural, FUSE menjembatani aplikasi dan filesystem userspace melalui VFS linux, modul kernel FUSE, dan daemon userspace. Modul kernel FUSE mendaftarkan driver filesystem pada VFS Linux dan mengekspos /dev/fuse sebagai kanal komunikasi dengan daemon di userspace. Saat aplikasi memanggil operasi seperti \texttt{open}, \texttt{read}, atau \texttt{write}, request terlebih dahulu masuk ke VFS, diteruskan ke driver FUSE, ditulis ke \texttt{/dev/fuse}, lalu dibaca dan diproses oleh daemon userspace sebelum hasilnya dikirim kembali ke kernel dan aplikasi. Pada Linux, filesystem FUSE yang di-mount memang berjalan sebagai proses userspace, sehingga implementasi logika seperti path, pemetaan metadata, atau enkripsi dapat ditempatkan sepenuhnya di daemon tersebut\cite{YanDefuse}. Alur request FUSE dapat diringkas sebagai proses berantai dari aplikasi ke VFS, ke modul kernel FUSE, ke daemon userspace, lalu kembali lagi ke pemanggil.
+
+Diagram alur FUSE
+
+Keunggulan utama FUSE terletak pada fleksibilitas pengembangan yang dimiliki. Non-privileged user dapat membangun filesystem tanpa memodifikasi kernel melalui antarmuka yang stabil sehingga pendekatan ini cocok untuk membangun filesystem kustom, stackable, atau eksperimental\cite{Zou2022UserLevel}. Penelitian lain juga menekankan bahwa pendekatan userspace meningkatkan isolasi dan reliabilitas karena gangguan pada logika filesystem tidak langsung mempengaruhi kernel\cite{ChoRFUSE}.
+
+Adapun kelemahan utama FUSE adalah overhead performa yang dihasilkan. Sebagian besar penelitian sepakat bahwa FUSE menambah beban pada context switch, penyalinan data, dan alur I/O yang lebih panjang daripada filesystem kernel-native\cite{Rietveld2022Opleiding}. Mekanisme forwarding semua request ke daemon userspace merupakan akar utama yang menimbulkan overhead tersebut, terutama saat operasi data atau metadata dengan frekuensi tinggi\cite{Rietveld2022Opleiding}. Besarnya penalti kinerja tersebut sangat bergantung pada workload. Studi skala besar melaporkan degradasi throughput dari nyaris tak terlihat hingga -83\%, latensi operasi bisa naik sampai 4 kali lipat, CPU utilization bisa naik hingga 31\%, dan bandwidth disk terpakai -80\% lebih rendah dibanding ext4\cite{}. Meski demikian, bukti yang ditemukan tidak sepenuhnya negatif, beberapa workload data-intensif menunjukkan dampak yang kecil dan beberapa studi menyimpulkan FUSE tetap layak untuk produksi bila karakteristik bebannya disesuaikan\cite{ChoRFUSE}.
+
+Pada sistem berkas terenkripsi, FUSE menjadi pondasi utama yang memungkinkan logika enkripsi-dekripsi ditempatkan secara transparan pada daemon userspace tanpa mengubah antarmuka aplikasi\cite{Lembke2022DEFUSE:}. Dalam praktiknya, operasi seperti \texttt{read} dan \texttt{write} menjadi titik integrasi alami untuk dekripsi sebelum data dikembalikan ke aplikasi dan enkripsi sebelum data diteruskan ke storage backend. Sebuah penelitian mengenai FUSE sebagai customized filesystem menunjukkan bahwa request memang diterjemahkan dan diproses oleh daemon userspace sebelum mengakses filesystem dasar.
+
+Implementasi arsitektur desain ini secara inheren melibatkan kompromi teknis (trade-off) yang signifikan. Penempatan logika keamanan pada userspace mempermudah proses implementasi serta pengujian eksperimental; namun, setiap operasi instruksi baca-tulis (read-write) harus menanggung beban overhead dari arsitektur FUSE. Akibatnya, performa sistem akhir menjadi sangat sensitif terhadap frekuensi I/O, ukuran request, serta intensitas operasi metadata\cite{Huai2021XFUSEAI,Faria2021BDUS:}. Karena itu, banyak penelitian yang telah dilakukan untuk optimisasi FUSE yang berfokus pada pengurangan perpindahan konteks atau penyalinan request, misalnya dengan menerapkan bypass pada sebagian jalur data, memisahkan data dan metadata, menggunakan ring buffer per-core, atau bahkan menghilangkan intervensi FUSE pada jalur tertentu\cite{ChoRFUSE,Lembke2022DEFUSE:,Zou2022UserLevel,YanDefuse}.
+
+Untuk penelitian ini, FUSE dapat dirumuskan sebagai pendekatan implementasi sistem berkas yang menempatkan logika utama di ruang pengguna melalui perantara VFS, modul kernel FUSE, dan daemon userspace. Pendekatan ini mempudahkan pengembangan sistem berkas terenkripsi, tetapi menghasilkan trade-off performa akibat adanya context switch dan penyalinan data tambahan yang harus dipertimbangkan pada desain akhir.
+
+\subsection{Kriptografi}
+Kriptografi merupakan ilmu dan seni untuk mengamankan informasi dengan cara mengubah data asli (plaintext) menjadi teks sandi (ciphertext) sehingga tidak dapat dibaca atau dipahami oleh pihak yang tidak berwenang\cite{}. Dalam konteks modern, kriptografi juga dipahami sebagai studi tentang teknik dan protokol untuk komunikasi yang mengamankan dari keberadaan pihak ketiga atau adversary\cite{}. Proses tersebut dilakukan melalui algoritma kriptografi yang melibatkan penggunaan kunci untuk enkripsi dan dekripsi.
+
+Tujuan utama kriptografi adalah untuk menyediakan kerahasiaan, integritas, autentikasi, dan nirpenyangkalan pada suatu informasi\cite{}. Kerahasiaan menjamin bahwa informasi hanya dapat dibaca oleh pihak yang berwenang\cite{}. Integritas menjamin bahwa data tidak diubah secara tidak sah dan bahwa manipulasi seperti penyisipan, penghapusan, atau substitusi dapat dideteksi\cite{}. Autentikasi berkaitan dengan pembuktian identitas dari entitas dan asal data\cite{}. Nirpenyangkalan menchegah suatu pihak menyangkal tindakan atau pesan yang sebelumnya telah dibuat atau dikirim\cite{}.
+
+Gambar segitiga CIA + Nirpenyangkalan
+
+Dalam sistem berkas terenkripsi, kerahasiaan dicapai dengan mengenkripsi data sebelum disimpan sehingga media penyimpanan yang diakses tanpa otorisasi tidak dapat langsung mengungkap isi data\cite{}. Integritas tetap memerlukan mekanisme tambahan, karena enkripsi saja tidak selalu dapat mendeteksi modifikasi pada data\cite{}. Untuk itu, Message Authentication Code (MAC) umum digunakan untuk memeriksa keaslian dan integritas pesan atau data\cite{}. Dalam perkembangannya, authenticated encryption juga digunakan sebagai pendekatan default untuk sistem modern, karena menggabungkan kerahasiaan dan autentikasi dalam satu konstruksi\cite{}.
+
+Secara umum, algoritma kriptografi terbagi menjadi kriptografi simetris dan kriptografi asimetris\cite{}. Pada kriptografi simetris, kunci yang sama dipakai untuk enkripsi dan dekripsi\cite{}. Pada kriptografi asimetris, proses tersebut menggunakan pasangan kunci publik dan kunci privat yang berbeda\cite{}. Kriptografi simetris cenderung lebih efisien secara komputasi daripada kriptografi asimetris, sehingga umum digunakan untuk melindungi data dalam jumlah besar atau pada sistem dengan trafik tinggi\cite{}. Sebaliknya, kriptografi asimetris lebih sering dikaitkan dengan digital signature dan key agreement daripada enkripsi bulk data\cite{}.
+
+Tabel perbandingan simetris vs asimetris
+
+Dalam kriptografi simetris, terdapat dua kategori utama, yaitu block cipher dan stream cipher\cite{}. Block cipher memproses data dalam blok berukuran tetap, dan menggunakan mode operasi untuk menentukan bagaimana blok-blok tersebut digunakan untuk mengenkripsi pesan atau data dengan panjang sembarang\cite{}. Mode yang distandarisasi untuk block cipher meliputi ECB, CBC, CFB, OFB, CTR, dan pada konteks authenticated encryption juga GCM\cite{}.
+
+Stream cipher mengenkripsi data secara bertahap dengan membangkitkan keystream yang kemudian dikombinasikan dengan plaintext, umumnya menggunakan XOR\cite{}. Stream cipher cenderung lebih unggul pada aliran data kontinu dan komunikasi real-time karena sederhana dan cepat\cite{}. Namun, keamanan stream cipher sangat bergantung pada penggunaan keystream yang benar dan penggunaan kembali seed atau initial state dapat menimbulkan kelemahan yang serius\cite{}.
+
+\subsection{Advanced Encryption Standard}
+Advanced Encryption Standard (AES) adalah standar algoritma enkripsi yang ditetapkan oleh National Institute of Standards and Technology (NIST)\cite{Rahma2022Proposed}. AES merupakan algoritma kriptografi simetris berbasis block cipher yang memproses data dalam blok dengan ukuran tetap, yaitu 128 bit. AES mendukung tiga panjang kunci, yaitu 128 bit, 192 bit, dan 256 bit. Perbedaan panjang kunci tersebut menentukan jumlah putaran (round) yang digunakan dalam proses enkripsi dan dekripsi.\cite{Spoorthy2025Design}
+
+Dalam proses enkripsi, AES memproses plaintext dalam blok berukuran 128 bit. Setiap blok tersebut direpresentasikan dalam bentuk State, yaitu array berukuran $4 \times 4$ byte\cite{Shazhaq2023Analisa}. Selanjutnya, State mengalami serangkaian transformasi untuk menghasilkan ciphertext. Transformasi utama dalam AES meliputi SubBytes, ShiftRows, MixColumns, dan AddRoundKey. SubBytes melakukan substitusi terhadap setiap byte pada State menggunakan tabel substitusi yang disebut S-box. ShiftRows menggeser byte pada setiap baris State secara siklik dengan jumlah pergeseran yang berbeda. MixColumns melakukan pencampuran data pada setiap kolom State dengan mengalikan setiap kolom menggunakan matriks konstan yang telah ditentukan melalui operasi aritmetika pada Galois Field $GF(2^8)$. Sementara itu, AddRoundKey menggabungkan State dengan Round Key yang sesuai menggunakan operasi XOR. Round Key tersebut dihasilkan dari Cipher Key melalui proses Key Expansion. Sebelum round pertama, dilakukan AddRoundKey awal. Selanjutnya, transformasi utama diterapkan dalam beberapa round sesuai dengan panjang kunci. Pada round terakhir, transformasi MixColumns tidak dilakukan\cite{Taufiqqurrachman2022Security}.
+
+\begin{figure}[H]
+    \centering
+    \input{gambar/aes-diagram.tex}
+    \caption{Diagram alur proses enkripsi dan dekripsi AES-256}
+    \label{fig:aes-256}
+\end{figure}
+
+
+Berdasarkan panjang kunci yang digunakan, Advanced Encryption Standard (AES) diklasifikasikan menjadi tiga varian utama, yaitu AES-128, AES-192, dan AES-256. Angka pada setiap varian tersebut merepresentasikan ukuran kunci yang digunakan, yaitu masing-masing sepanjang 128 bit, 192 bit, dan 256 bit secara berurutan. Jumlah round ditentukan oleh panjang kunci yang digunakan, yaitu AES-128 menggunakan 10 round, AES-192 menggunakan 12 round, dan AES-256 menggunakan 14 round\cite{Rahma2022Proposed}. Penelitian ini difokuskan pada penerapan AES-256 sebagai algoritma block cipher untuk mengimplementasikan sistem berkas terenkripsi pada ruang pengguna.
+
+Untuk mengenkripsi data yang terdiri atas banyak blok, AES digunakan bersama mode operasi yang menentukan bagaimana blok-blok tersebut diproses. Salah satu mode operasi yang umum digunakan adalah Galois/Counter Mode (GCM). GCM merupakan mode operasi untuk block cipher kunci simetris yang menyediakan enkripsi sekaligus autentikasi pesan dengan memanfaatkan counter mode dan universal hashing pada medan biner. Karena itu, GCM tidak hanya menyediakan confidentiality, tetapi juga integrity dan authenticity\cite{Fischlin2026QuantumResistant}.
+
+Pada GCM, fungsi authenticated encryption menerima tiga masukan, yaitu plaintext, AAD, dan IV. GCM Melindungi kerahasiaan plaintext serta keaslian plaintext dan AAD, sementara AAD tetap tidak dienkripsi. Keluaran proses enkripsi berupa ciphertext dan authentication tag. Authentication tag dipakai saat dekripsi untuk memverifikasi integritas dan keaslian data yang diproses\cite{Anh2026Refining}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{gambar/aesgcm.png}
+    \caption{Diagram alur AES-GCM}
+    \label{fig:aesgcm}
+\end{figure}
+
+Dalam GCM, IV pada dasarnya adalah nonce yang harus unik dalam konteks penggunaan kunci tertentu. Keunikan nonce merupakan syarat penting karena kelemahan atau penggunaan ulang nonce dapat merusak jaminan keamanan GCM\cite{Chung2025Making}. Bukti yang lebih baru juga menunjukkan bahwa keamanan GCM dibatasi oleh jumlah blok dan kueri yang diproses, serta beberapa varian baru dikembangkan untuk memperbaiki batas keamanan tersebut\cite{Anh2026Refining}. Analisis lain bahkan melaporkan bahwa GCM dengan random IV 96-bit memberikan tingkat keamanan kurang dari 97 bit, sehingga konstruksi IV perlu dilakukan dengan hati-hati\cite{Mattsson2024Collision}.
+
+Kombinasi AES dengan GCM menghasilkan skema AES-GCM, yang termasuk kategori AEAD karena menyediakan kerahasiaan sekaligus autentikasi dan integritas data\cite{Anh2026Refining}. Pada konfigurasi AES-256-GCM, AES-256 menyediakan enkripsi dengan kunci 256 bit dan 14 round, sedangkan GCM menyediakan pemrosesan IV, AAD, dan pembentukan tag autentikasi. Dengan demikian, penggunaan AES-256-GCM pada sistem berkas ruang pengguna sesuai untuk melindungi isi data sekaligus mendeteksi perubahan yang tidak sah terhadap data\cite{Anh2026Refining}.
+
+\subsection{Argon2id}
+Argon2id merupakan salah satu varian dari algoritma Argon2, yaitu fungsi hash kata sandi (password hashing function) yang keluar sebagai pemenang Password Hashing Competition pada tahun 2015\cite{}. Argon2 dirancang untuk menghasilkan turunan kunci (derived key) dari suatu masukan, umumnya berupa kata sandi, dengan tingkat ketahanan yang tinggi terhadap serangan brute-force maupun serangan menggunakan perangkat keras khusus seperti GPU, FPGA, dan ASIC\cite{}. Argon2 memiliki tiga varian utama, yaitu Argon2d, Argon2i, dan Argon2id. Argon2d mengakses memori dengan pola yang bergantung pada data (data-dependent), sehingga lebih tahan terhadap serangan trade-off waktu dan memori, namun rentan terhadap serangan side-channel. Argon2i mengakses memori dengan pola yang tidak bergantung pada data (data-independent), sehingga lebih tahan terhadap serangan side-channel namun memerlukan lebih banyak iterasi untuk mencapai tingkat keamanan yang setara. Argon2id merupakan kombinasi dari kedua pendekatan tersebut, yaitu menggunakan akses memori data-independent pada tahap awal proses dan data-dependent pada tahap selanjutnya, sehingga menghasilkan keseimbangan antara ketahanan terhadap serangan side-channel dan serangan trade-off waktu-memori\cite{}.
+
+Argon2id tergolong sebagai fungsi hash yang memory-hard, yaitu fungsi yang dirancang agar proses komputasinya memerlukan alokasi memori dalam jumlah besar, bukan hanya waktu komputasi yang lama\cite{}. Karakteristik ini menjadikan Argon2id sulit dipercepat menggunakan perangkat keras paralel seperti GPU atau ASIC, karena perangkat tersebut umumnya unggul dalam komputasi paralel namun memiliki keterbatasan pada kapasitas memori berkecepatan tinggi yang dibutuhkan. Dengan demikian, upaya serangan brute-force terhadap kata sandi menggunakan perangkat keras khusus menjadi jauh lebih mahal secara sumber daya dibandingkan terhadap fungsi hash konvensional seperti SHA-256 atau bahkan fungsi hash kata sandi generasi sebelumnya seperti PBKDF2\cite{}.
+
+Proses komputasi Argon2id dikendalikan oleh tiga parameter utama, yaitu memory cost (m), yang menentukan jumlah memori yang dialokasikan selama komputasi; time cost (t), yang menentukan jumlah iterasi atau pass yang dilakukan terhadap memori tersebut; dan parallelism (p), yang menentukan derajat paralelisme atau jumlah thread yang digunakan selama komputasi\cite{}. Ketiga parameter tersebut dapat disesuaikan untuk menyeimbangkan antara tingkat keamanan yang dihasilkan dengan sumber daya komputasi dan waktu eksekusi yang tersedia pada perangkat yang menjalankannya.
+
+Dalam konteks penelitian ini, Argon2id digunakan sebagai mekanisme untuk menurunkan kunci kriptografis dari kata sandi yang dimasukkan oleh pengguna. Alih-alih menggunakan kata sandi secara langsung sebagai kunci enkripsi, kata sandi tersebut beserta suatu nilai acak yang disebut salt diproses melalui Argon2id untuk menghasilkan sebuah master key dengan panjang dan tingkat keacakan yang sesuai untuk digunakan pada algoritma AES-256-GCM. Penggunaan Argon2id pada tahap ini bertujuan untuk memperlambat upaya serangan brute-force terhadap kata sandi pengguna, mengingat kata sandi pada umumnya memiliki tingkat entropi yang jauh lebih rendah dibandingkan kunci kriptografis yang dihasilkan secara acak\cite{}.
+
+\subsection{HKDF}
+HMAC-based Extract-and-Expand Key Derivation Function (HKDF) merupakan fungsi turunan kunci (key derivation function) berbasis HMAC (Hash-based Message Authentication Code) yang distandarisasi melalui RFC 5869\cite{}. Berbeda dengan Argon2id yang dirancang untuk menurunkan kunci dari masukan dengan entropi rendah seperti kata sandi, HKDF dirancang untuk menurunkan satu atau lebih kunci kriptografis dari suatu bahan kunci awal (input keying material) yang sudah memiliki tingkat keacakan atau entropi yang cukup tinggi, seperti master key yang dihasilkan oleh Argon2id\cite{}.
+
+Proses kerja HKDF terdiri atas dua tahap utama, yaitu tahap extract dan tahap expand\cite{}. Pada tahap extract, bahan kunci awal (input keying material) dikombinasikan dengan sebuah nilai salt menggunakan fungsi HMAC untuk menghasilkan sebuah pseudorandom key (PRK) dengan panjang tetap. Tahap ini bertujuan untuk memadatkan (condense) bahan kunci awal, yang mungkin memiliki distribusi keacakan yang tidak merata, menjadi sebuah kunci dengan tingkat keacakan yang seragam dan terstandarisasi\cite{}. Pada tahap expand, PRK yang dihasilkan dari tahap extract kemudian digunakan bersama sebuah parameter informasi konteks (info) untuk menghasilkan keluaran akhir (output keying material) dengan panjang yang dapat disesuaikan sesuai kebutuhan, melalui pemanggilan fungsi HMAC secara berulang terhadap PRK\cite{}.
+
+Penggunaan parameter info pada tahap expand memungkinkan HKDF menghasilkan beberapa kunci turunan yang berbeda dari satu PRK yang sama, dengan cara memberikan nilai info yang berbeda untuk setiap tujuan penggunaan kunci\cite{}. Karakteristik ini menjadikan HKDF sesuai digunakan pada sistem yang memerlukan lebih dari satu kunci kriptografis dari satu sumber rahasia yang sama, misalnya kunci enkripsi data dan kunci untuk keperluan autentikasi, tanpa perlu menyimpan atau mengelola kunci-kunci tersebut secara terpisah.
+
+Dalam konteks penelitian ini, HKDF digunakan pada tahap setelah proses turunan kunci menggunakan Argon2id. Master key yang dihasilkan oleh Argon2id dari kata sandi pengguna digunakan sebagai input keying material bagi HKDF, yang kemudian menurunkan kunci enkripsi spesifik yang digunakan oleh algoritma AES-256-GCM untuk setiap berkas atau setiap sesi penggunaan sistem. Pendekatan bertingkat ini, yaitu Argon2id untuk memperlambat serangan terhadap kata sandi dan HKDF untuk menurunkan kunci kerja dari master key, memungkinkan sistem berkas terenkripsi yang dibangun memiliki pemisahan yang jelas antara kunci induk dan kunci kerja, sehingga meningkatkan fleksibilitas dan keamanan pengelolaan kunci secara keseluruhan\cite{}.
 
 \begin{table}[H]
     \centering
     \caption{Contoh tabel 1}
-    \label{t blok}
+    \label{t-blok}
     \begin{tabular}{|c|l|l|}
         \hline
-        \rowcolor[HTML]{C0C0C0} 
-        {\color[HTML]{000000} No.} & \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}{\color[HTML]{000000} Nama}} & \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}Fungsi}  \\ \hline
-        \rowcolor[HTML]{FFFFFF} 
+        \rowcolor[HTML]{C0C0C0}
+        {\color[HTML]{000000} No.} & 
+        \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}{\color[HTML]{000000} Nama}} & 
+        \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}Fungsi} \\ 
+        \hline
+        
+        \rowcolor[HTML]{FFFFFF}
         1 & \textit{Nama rincian objek yang akan dibahas 1} & Fungsi rincian objek penjelasan 1 \\ \hline
         2 & \textit{Nama rincian objek yang akan dibahas 2} & Fungsi rincian objek penjelasan 2 \\ \hline
         3 & \textit{Nama rincian objek yang akan dibahas 3} & Fungsi rincian objek penjelasan 3 \\ \hline
@@ -39,8 +128,6 @@
 
 \lipsum[2]
 
-\subsection{Sub Dasar Teori IV}
-\lipsum[2]
 
 \section{Hipotesis}
 \lipsum[2]

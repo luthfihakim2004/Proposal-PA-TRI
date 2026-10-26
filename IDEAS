@@ -1,0 +1,10 @@
+Apa itu data?
+Peran data
+Keamanan data menjadi krusial karena memiliki peran yang penting
+Filesystem sebagai yang bertanggung jawab dalam pengelolaan dan penyimpanan data masih dianggap masih memerlukan pengamanan tambahan
+Enkripsi standar pada disk penyimpanan (LUKS & BitLocker) memerlukan hak administrator untuk melindungi file-file kritikal dari sistem
+Encrypted FUSE Filesystem menyediakan filesystem yang aman, transparan dan fleksibel tanpa memerlukan hak administrator
+Contoh encrypted yg paling baru adl gocryptfs sebagai 'golden standard' tp msh ada yg dapat diperbaiki/ditingkatkan.
+
+Struktural:
+But your filesystem still has to decide how the nonce, ciphertext, tag, and any metadata are stored.

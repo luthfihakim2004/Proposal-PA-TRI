@@ -1,0 +1,167 @@
+\begin{tikzpicture}[
+    >=Stealth,
+    font=\small,
+    box/.style={
+        draw,
+        rectangle,
+        minimum height=0.48cm,
+        minimum width=3.4cm,   % measured longest label ("SubBytes")
+                                % is ~3.18cm incl. inner sep at 12pt/\small in
+                                % plain Computer Modern (the user's document
+                                % font) -- 3.4cm leaves real headroom so the
+                                % node never auto-grows past this size
+        inner sep=2pt,
+        align=center
+    },
+    round/.style={
+        draw,
+        rectangle,
+        inner sep=0pt
+    },
+    keylabel/.style={
+        font=\small
+    }
+]
+
+% ============================================================
+% GENERAL X POSITIONS
+% All gaps below are real (>=0.2cm), not flush-against-the-edge,
+% so small font/metric differences between LaTeX setups can't
+% reopen the overlap.
+% ============================================================
+
+% Left process center: sidebar right edge (0.88) + gap (0.2) + half box (1.7)
+\def\LX{2.78}
+\def\KX{5.93}
+\def\RX{9.71}
+\node at (\LX,15.0) {Plaintext};
+\node[box, minimum width=2.65cm] (Linitial)
+    at (\LX,14.25) {AddRoundKey};
+\draw[->] (\LX,14.88) -- (Linitial.north);
+\draw[round] (0.25,10.15) rectangle (4.68,13.90);
+\draw (0.45,10.35) rectangle (0.88,13.70);
+\node[rotate=90] at (0.665,12.02) {Round \# 1};
+\node[box]
+    (L1sub) at (\LX,13.42) {SubBytes};
+\node[box]
+    (L1shift) at (\LX,12.70) {ShiftRows};
+\node[box]
+    (L1mix) at (\LX,11.98) {MixColumns};
+\node[box]
+    (L1add) at (\LX,10.58) {AddRoundKey};
+\draw[->] (Linitial.south) -- (L1sub.north);
+\draw[->] (L1sub.south) -- (L1shift.north);
+\draw[->] (L1shift.south) -- (L1mix.north);
+\draw[->] (L1mix.south) -- (L1add.north);
+\draw[round] (0.25,4.30) rectangle (4.68,8.75);
+\draw (0.45,4.52) rectangle (0.88,8.53);
+\node[rotate=90] at (0.665,6.53) {Round \# 13};
+\node[box]
+    (L9sub) at (\LX,8.25) {SubBytes};
+\node[box]
+    (L9shift) at (\LX,7.52) {ShiftRows};
+\node[box]
+    (L9mix) at (\LX,6.79) {MixColumns};
+\node[box]
+    (L9add) at (\LX,4.82) {AddRoundKey};
+\draw[->] (L1add.south) -- (2.78,9.85);
+\draw[->] (L9sub.south) -- (L9shift.north);
+\draw[->] (L9shift.south) -- (L9mix.north);
+\draw[->] (L9mix.south) -- (L9add.north);
+\draw[round] (0.25,0.45) rectangle (4.68,3.95);
+\draw (0.45,0.67) rectangle (0.88,3.73);
+\node[rotate=90] at (0.665,2.20) {Round \# 14};
+\node[box]
+    (L10sub) at (\LX,3.42) {SubBytes};
+\node[box]
+    (L10shift) at (\LX,2.70) {ShiftRows};
+\node[box]
+    (L10add) at (\LX,1.05) {AddRoundKey};
+\draw[->] (L9add.south) -- (L10sub.north);
+\draw[->] (L10sub.south) -- (L10shift.north);
+\draw[->] (L10shift.south) -- (L10add.north);
+\node at (\LX,-0.15) {Ciphertext};
+\draw[->] (L10add.south) -- (\LX,0.05);
+\node[box, minimum width=2.65cm]
+    (Rbottomadd) at (\RX,1.05) {AddRoundKey};
+\node at (\RX,-0.15) {Ciphertext};
+\draw[->] (\RX,-0.02) -- (Rbottomadd.south);
+\draw[round] (7.18,1.45) rectangle (11.61,5.80);
+\draw (7.38,1.67) rectangle (7.81,5.58);
+\node[rotate=90] at (7.595,3.63) {Round \# 1};
+\node[box]
+    (R1shift) at (\RX,1.92) {Inverse ShiftRows};
+\node[box]
+    (R1sub) at (\RX,2.65) {Inverse SubBytes};
+\node[box]
+    (R1add) at (\RX,3.45) {AddRoundKey};
+\node[box]
+    (R1mix) at (\RX,5.08) {Inverse MixColumns};
+\draw[->] (Rbottomadd.north) -- (R1shift.south);
+\draw[->] (R1shift.north) -- (R1sub.south);
+\draw[->] (R1sub.north) -- (R1add.south);
+\draw[->] (R1add.north) -- (R1mix.south);
+\draw[round] (7.18,6.95) rectangle (11.61,11.15);
+\draw (7.38,7.17) rectangle (7.81,10.93);
+\node[rotate=90] at (7.595,9.05) {Round \# 13};
+\node[box]
+    (R9shift) at (\RX,7.55) {Inverse ShiftRows};
+\node[box]
+    (R9sub) at (\RX,8.28) {Inverse SubBytes};
+\node[box]
+    (R9add) at (\RX,10.00) {AddRoundKey};
+\node[box]
+    (R9mix) at (9.71,10.69) {Inverse MixColumns};
+\draw[->] (R1mix.north) -- (9.71,6.05);
+\draw[->] (R9shift.north) -- (R9sub.south);
+\draw[->] (R9sub.north) -- (R9add.south);
+\draw[->] (R9add.north) -- (R9mix.south);
+\draw[round] (7.18,11.55) rectangle (11.61,14.55);
+\draw (7.38,11.77) rectangle (7.81,14.33);
+\node[rotate=90] (node1) at (7.595,13.05) {Round \# 14};
+\node[box]
+    (R10shift) at (9.71,12.01) {Inverse ShiftRows};
+\node[box]
+    (R10sub) at (\RX,12.78) {Inverse SubBytes};
+\node[box]
+    (R10add) at (9.7,14.09) {AddRoundKey};
+\draw[->] (R9mix.north) -- (R10shift.south);
+\draw[->] (R10shift.north) -- (R10sub.south);
+\draw[->] (R10sub.north) -- (R10add.south);
+\node at (\RX,15.0) {Plaintext};
+\draw[->] (R10add.north) -- (\RX,14.88);
+\node (node2) at (5.93,15.74) {Key};
+\node[keylabel] (W03) at (5.93,14.09) {$\mathrm{w}(0,3)$};
+\node[box, minimum width=2.3cm]   % measured "Expand key" is ~2.14cm incl.
+                                    % inner sep at 12pt/\small CM; 2.3cm has
+                                    % headroom so it never auto-grows
+    (ExpandKey) at (5.93,15) {Expand key};
+\draw[->] (W03.east) -- (R10add.west);
+\draw[->] (5.93,15.6) -- (ExpandKey.north);
+\draw[->] (W03.west) -- (Linitial.east);
+\node[keylabel] (W47) at (\KX,10.95) {$\mathrm{w}(4,7)$};
+\draw[->] (W47.west) -- (L1add.east);
+\draw[->] (W47.east) -- (R9add.west);
+\node[keylabel] (W3639) at (\KX,4.82)
+    {$\mathrm{w}(52,55)$};
+\draw[->] (W3639.west) -- (L9add.east);
+\draw[->] (W3639.east) -- (R1add.west);
+\node[keylabel] (W4043) at (\KX,1.05)
+    {$\mathrm{w}(56,59)$};
+\draw[->] (W4043.west) -- (L10add.east);
+\draw[->] (W4043.east) -- (Rbottomadd.west);
+\draw[->] (W03.south) -- (\KX,11.25);
+\draw[->] (\KX,10.65) -- (\KX,5.12);
+\draw[->] (\KX,4.50) -- (\KX,1.35);
+\begin{scope}[shift={(0.96,0.1)}]
+  \foreach \y in {6.0,6.2,...,6.6}
+    \fill (8.75,\y) circle (1.5pt);
+\end{scope}
+\begin{scope}[shift={(-5.97,-0.3)}]
+  \foreach \y in {9.5,9.7,...,10.2}
+    \fill (8.75,\y) circle (1.5pt);
+\end{scope}
+\draw[->] (2.78,9.17) -- (L9sub.north);
+\draw[->] (9.71,6.7) -- (R9shift.south);
+  \draw[->] (ExpandKey.south) -- (W03.north);
+\end{tikzpicture}
