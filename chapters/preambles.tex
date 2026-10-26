@@ -1,4 +1,4 @@
-% Mengatur bahasa latex
+% Mengatur bahasa & encoding latex
 \usepackage[indonesian]{babel}
 \usepackage[utf8]{inputenc}
 
@@ -53,27 +53,24 @@
 \settowidth\mylen{\bfseries BAB 1 :\ } % if more than 9 chapters, use "Chapter 10"
 \cftsetindents{chap}{0pt}{\mylen}
 
-% Mengatur font section
-\usepackage{sectsty}
-\sectionfont{\fontsize{12}{14}\selectfont}
-\subsectionfont{\fontsize{12}{14}\selectfont}
-\subsubsectionfont{\fontsize{12}{14}\selectfont}
-
 % Untuk merupakan format penulisan BAB
 \usepackage{titlesec}
 \titleformat{\chapter}
 {\doublespacing\fontsize{14pt}{16pt}\bfseries}
 {\MakeUppercase{\chaptertitlename\ \Roman{chapter}}\filcenter}
 {0.15cm}{\centering\uppercase}
-\titlespacing*{\chapter}{0pt}{-1cm}{20pt}
 
 % Mengatur spacing section
-\titlespacing*{\section}
-{0pt}{10pt}{0cm}
-\titlespacing*{\subsection}
-{0pt}{10pt}{0cm}
-\titlespacing*{\subsubsection}
-{0pt}{10pt}{0cm}
+\titleformat{\section}
+  {\fontsize{12}{14}\selectfont\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\fontsize{12}{14}\selectfont\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\fontsize{12}{14}\selectfont\bfseries}{\thesubsubsection}{1em}{}
+
+\titlespacing*{\section}{0pt}{10pt}{0cm}
+\titlespacing*{\subsection}{0pt}{10pt}{0cm}
+\titlespacing*{\subsubsection}{0pt}{10pt}{0cm}
 
 % Digunakan untuk mengatur caption dalam dokumen.
 \usepackage[font=footnotesize,format=plain,labelfont=bf,up,textfont=up]{caption}
@@ -116,9 +113,6 @@
 % Teks testing
 \usepackage{blindtext}
 \usepackage{lipsum}
-
-% Untuk mengatur subscript supscript
-\usepackage{fixltx2e}
 
 % Untuk formatting quote pada halaman motto
 \usepackage{epigraph}

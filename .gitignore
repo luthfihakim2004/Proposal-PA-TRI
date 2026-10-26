@@ -1,0 +1,8 @@
+## Core LaTeX auxiliary files
+*.aux *.lof *.log *.lot *.fls *.out *.toc *.fmt *.fot *.cb *.cb2 .*.lb
+
+## Bibliography auxiliary files (BibTeX / BibLaTeX / Biber)
+*.bbl *.bbl-SAVE-ERROR *.bcf *.bcf-SAVE-ERROR *.blg *-blx.aux *-blx.bib *.run.xml
+
+## Build tool/Editor artifacts (Latexmk, SyncTeX, Minted)
+*.fdb_latexmk *.synctex* *.pdfsync _minted* *.pyg *.snm *.nav *.vrb *.upa *.upb
