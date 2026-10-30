@@ -1,4 +1,4 @@
-This is BibTeX, Version 0.99d (TeX Live 2024 Gentoo Linux)
+This is BibTeX, Version 0.99e (TeX Live 2026 Gentoo Linux)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: Proposal PA.aux
 The style file: IEEEtran.bst
@@ -23,47 +23,48 @@ Warning--I didn't find a database entry for ""
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
 Warning--empty journal in Rietveld2022Opleiding
+Warning--empty journal in Tippe2025Evaluating
 
 Done.
-You've used 16 entries,
+You've used 29 entries,
             4087 wiz_defined-function locations,
-            929 strings with 11043 characters,
-and the built_in function-call counts, 9377 in all, are:
-= -- 736
-> -- 259
-< -- 38
-+ -- 135
-- -- 61
-* -- 453
-:= -- 1534
-add.period$ -- 33
-call.type$ -- 16
-change.case$ -- 16
-chr.to.int$ -- 81
-cite$ -- 17
-duplicate$ -- 734
-empty$ -- 772
-format.name$ -- 67
-if$ -- 2125
+            1003 strings with 13488 characters,
+and the built_in function-call counts, 15783 in all, are:
+= -- 1252
+> -- 402
+< -- 60
++ -- 207
+- -- 92
+* -- 726
+:= -- 2623
+add.period$ -- 59
+call.type$ -- 29
+change.case$ -- 29
+chr.to.int$ -- 117
+cite$ -- 31
+duplicate$ -- 1263
+empty$ -- 1321
+format.name$ -- 105
+if$ -- 3570
 int.to.chr$ -- 0
-int.to.str$ -- 16
-missing$ -- 138
-newline$ -- 77
-num.names$ -- 16
-pop$ -- 349
+int.to.str$ -- 29
+missing$ -- 253
+newline$ -- 122
+num.names$ -- 29
+pop$ -- 620
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 2
-skip$ -- 707
+skip$ -- 1204
 stack$ -- 0
-substring$ -- 234
-swap$ -- 511
-text.length$ -- 11
+substring$ -- 335
+swap$ -- 877
+text.length$ -- 21
 text.prefix$ -- 0
 top$ -- 5
-type$ -- 16
-warning$ -- 1
-while$ -- 28
-width$ -- 18
-write$ -- 170
-(There were 2 warnings)
+type$ -- 29
+warning$ -- 2
+while$ -- 48
+width$ -- 31
+write$ -- 289
+(There were 3 warnings)

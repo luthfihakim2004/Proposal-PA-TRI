@@ -1,39 +1,200 @@
 \chapter[Kajian Pustaka]{\\ Kajian Pustaka}
 
 \section{Tinjauan Pustaka}
-Literatur mengenai metode pengamanan pada sistem berkas telah berkembang pesat seiring berjalannya waktu.
+Literatur mengenai metode pengamanan pada sistem berkas telah berkembang pesat seiring berjalannya waktu. Secara umum, penelitian yang relevan dengan penelitian ini dapat dikelompokkan ke dalam tiga arah, yaitu (1) penelitian mengenai kerangka kerja sistem berkas ruang pengguna (\textit{Filesystem in Userspace}, FUSE) beserta optimisasi performanya, (2) penelitian mengenai algoritma enkripsi terautentikasi AES-GCM beserta batas keamanannya, dan (3) penelitian mengenai proteksi dan turunan kunci (\textit{key derivation}) untuk mengubah kata sandi menjadi kunci kriptografis yang aman. Ketiga arah tersebut menjadi dasar dalam merancang sistem berkas terenkripsi pada ruang pengguna.
+ 
+\subsection{Penelitian pada Sistem Berkas Ruang Pengguna}
+Menurut Cho dkk. (2024)\cite{ChoRFUSE}, pengembangan sistem berkas \textit{native} yang diimplementasikan di ruang kernel (\textit{kernel-space}) memiliki kompleksitas tinggi karena memerlukan pengelolaan sumber daya kernel secara hati-hati serta perhatian terhadap stabilitas dan keamanan kode. Sebagai alternatif, \textit{Filesystem in Userspace} (FUSE) memungkinkan implementasi logika sistem berkas berjalan di ruang pengguna, sedangkan interaksi dengan kernel disediakan oleh antarmuka FUSE untuk menyederhanakan proses pengembangan\cite{Lembke2022DEFUSE:,Zou2022UserLevel}. Walaupun demikian, pendekatan FUSE dapat menimbulkan \textit{overhead} performa akibat komunikasi tambahan antara kernel dan proses di ruang pengguna, perpindahan konteks (\textit{context switch}), penyalinan data, serta tahapan pemrosesan I/O tambahan dibandingkan dengan sistem berkas yang diimplementasikan langsung di ruang kernel\cite{Holtrop2022LDPFUSE}.
 
-Berdasarkan ... , pengembangan sistem berkas berbasis kernel dinilai sulit karena tingginya kompleksitas
+Sejumlah penelitian telah mengusulkan optimisasi untuk mengurangi \textit{overhead} tersebut, terutama pada jalur komunikasi antara kernel dan \textit{daemon} di ruang pengguna. RFUSE\cite{ChoRFUSE} mengusulkan mekanisme komunikasi berbasis saluran melingkar (\textit{ring channels}) per \textit{core} untuk meningkatkan skalabilitas pemrosesan permintaan (\textit{request}) dibandingkan dengan pendekatan yang mengandalkan antrean tunggal (\textit{single queue}). Sementara itu, DEFUSE\cite{Lembke2022DEFUSE:} berfokus pada optimisasi pemrosesan permintaan melalui mekanisme \textit{bypassed file descriptor (FD) lookup}, \textit{FD stashing}, dan \textit{user-space paging} guna meningkatkan efisiensi pengelolaan permintaan pada FUSE. Di sisi lain, XFUSE\cite{Huai2021XFUSEAI} berupaya mengurangi latensi penanganan \textit{event} melalui mekanisme \textit{adaptive busy-event wait}, yang menerapkan strategi penantian adaptif untuk mengurangi waktu tunggu dalam mendeteksi dan menangani \textit{event}. Penelitian lain yang dilakukan oleh Faria dkk. (2021)\cite{Faria2021BDUS:} memindahkan implementasi \textit{block device} ke ruang pengguna untuk mencapai latensi rendah dan \textit{throughput} tinggi.
 
-Penelitian lain yang berfokus pada ... menunjukkan bahwa
+Secara umum, penelitian-penelitian tersebut menunjukkan bahwa optimisasi jalur komunikasi dan pemrosesan permintaan merupakan salah satu pendekatan penting untuk meningkatkan performa sistem berkas ruang pengguna. Meskipun demikian, penelitian-penelitian tersebut terutama berfokus pada optimisasi performa, bukan pada perlindungan data yang disimpan.
+ 
+Penelitian yang bersinggungan langsung dengan fokus bahasan ini dilakukan oleh Khashan dkk. (2023)\cite{Khashan2023Dynamic}, yang mengembangkan ParallelFS, yaitu sistem berkas terenkripsi berbasis FUSE yang dirancang khusus untuk berkas multimedia. Sistem ini membagi setiap blok data menjadi sub-blok yang dienkripsi secara paralel oleh beberapa \textit{core} menggunakan Blowfish mode CTR, sedangkan kunci berkas dilindungi dengan RSA-2048. Hasil pengujiannya menunjukkan bahwa proses kriptografi menyumbang sekitar 70\% dari waktu tulis dan 75\% dari waktu baca, dan \textit{throughput} yang dihasilkan masih jauh di bawah Ext4 tanpa enkripsi (19,2 MB/s untuk operasi tulis dan 37,1 MB/s untuk operasi baca), meskipun lebih baik dibandingkan EncFS dan ImgFS. Temuan ini menunjukkan bahwa pada sistem berkas terenkripsi, biaya kriptografi merupakan komponen utama yang menambah beban \textit{overhead} FUSE. Namun, analisis keamanan pada penelitian tersebut bersifat kualitatif dan berfokus pada kerahasiaan serta pengelolaan kunci, dan algoritma yang digunakan belum mencakup enkripsi terautentikasi seperti AES-GCM.
+ 
+Besarnya dampak kriptografi terhadap performa bergantung pada mekanisme keamanan yang diterapkan dan karakteristik beban kerja, sehingga perlu dievaluasi secara empiris. Selain aspek performa, sistem berkas terenkripsi yang menerapkan enkripsi-dekripsi dan manajemen kunci di ruang pengguna juga memerlukan perancangan perlindungan data dan kunci yang sesuai dengan kebutuhan keamanan. Oleh karena itu, diperlukan kajian yang mengevaluasi perlindungan kerahasiaan dan integritas data pada sistem berkas ruang pengguna sekaligus mengukur dampak penerapannya terhadap performa.
 
+\subsection{Penelitian pada Enkripsi AES-GCM}
+Dari aspek keamanan, \textit{Advanced Encryption Standard} (AES) merupakan standar algoritma enkripsi simetris yang umum digunakan dalam berbagai aplikasi keamanan informasi. Pemilihan AES dalam penelitian ini didasarkan pada kajian mengenai ketahanan rancangan dan keamanannya\cite{Rahma2022Proposed,Spoorthy2025Design,Taufiqqurrachman2022Security}. Menurut Taufiqqurrachman dan Elsandi (2022)\cite{Taufiqqurrachman2022Security}, sebagai algoritma ukuran blok 128 bit (\textit{block cipher}), AES memiliki tingkat keamanan yang andal karena membutuhkan sumber daya komputasi yang mahal untuk melakukan serangan kriptanalisis. Block cipher murni memiliki keterbatasan berupa ukuran data yang dapat diproses sesuai dengan algoritmanya, sehingga untuk memproses ukuran data yang lebih besar algoritma \textit{block cipher} dilengkapi dengan mode operasi. Mode \textit{Galois/Counter Mode} (GCM) dipilih karena memberikan perlindungan terintegrasi melalui konstruksi \textit{Authenticated Encryption with Associated Data} (AEAD) yang melindungi kerahasiaan sekaligus integritas data\cite{Anh2026Refining,Fischlin2026QuantumResistant}. 
 
+Meskipun demikian, jaminan keamanan AES-GCM sangat bergantung pada keunikan \textit{Initialization Vector} (IV) yang digunakan pada setiap operasi dengan kunci yang sama\cite{Chung2025Making}. Selain itu, tingkat keamanannya juga dipengaruhi oleh batas jumlah blok data dan kueri yang diproses selama masa pakai kunci tersebut\cite{Anh2026Refining}. Mattsson (2024)\cite{Mattsson2024Collision} menunjukkan bahwa penggunaan IV acak sepanjang 96 bit pada GCM dapat menurunkan tingkat keamanan terhadap serangan tumbukan (\textit{collision}) hingga di bawah 97 bit. Temuan-temuan ini menegaskan pentingnya pengelolaan kunci dan IV secara cermat pada implementasi AES-GCM di sistem berkas terenkripsi, khususnya ketika mengolah volume data yang besar secara berulang dalam jangka panjang.
+ 
+\subsection{Penelitian pada Proteksi dan Penurunan Kunci}
+%HKDF digunakan utk mendukung domain separation%
+Penelitian terdahulu menunjukkan bahwa skema pembungkusan kunci (\textit{key wrapping}) mampu melindungi kerahasiaan sekaligus integritas kunci kriptografi, sehingga memungkinkan kunci disimpan di luar modul aman (\textit{secure module})\cite{KeyBlob,cryptoeprint:2022/1499}. Dalam skema yang melibatkan penggunaan kata sandi, perlindungan kunci utama (\textit{master-key}) perlu mempertimbangkan tingkat entropi kata sandi yang digunakan sebagai sumber rahasia. Argon2id\cite{RFC9106} dapat digunakan sebagai fungsi penurunan kunci berbasis \textit{memory-hard} untuk menghasilkan kunci yang resisten terhadap serangan \textit{brute-force} dari kata sandi berentropi rendah hingga sedang, apabila dikonfigurasikan dengan parameter yang tepat. Namun, perlindungan ini tetap tidak dapat melindungi kata sandi yang sangat lemah atau mudah ditebak\cite{Tippe2025Evaluating}. Karakteristik \textit{memory-hard} pada Argon2id dapat meningkatkan kebutuhan sumber daya komputasi dan memori pada setiap percobaan penebakan kata sandi, sehingga secara signifikan memperbesar biaya serangan \textit{brute-force}\cite{Fedorchenko2024PASSWORD,coignard2025qatsistatelesssecretgeneration}. Dengan demikian, Argon2id memiliki peran untuk memperkuat perlindungan terhadap kunci yang dihasilkan dari kata sandi, sedangkan mekanisme pembungkusan kunci dapat digunakan untuk melindungi kunci kriptografi yang tersimpan.
+
+Selain derivasi kunci dari material awal, pemisahan kunci berdasarkan konteks penggunaan (\textit{domain separation}) merupakan prinsip penting dalam perancangan sistem kriptografi, termasuk pada sistem berkas terenkripsi, karena membantu mencegah penggunaan ulang kunci pada konteks yang berbeda (\textit{key reuse})\cite{Sun2026Tilewise}. RFC 5869\cite{RFC5869} mendefinisikan \textit{HMAC-based Key Derivation Function} (HKDF) sebagai mekanisme penurunan kunci yang mengikuti paradigma \textit{Extract-then-Expand}. Pada fase \textit{Extract}, material kunci awal diproses bersama \textit{salt} untuk menghasilkan \textit{pseudorandom key}, sedangkan pada fase \textit{Expand} kunci tersebut diperluas menjadi satu atau lebih kunci dengan panjang yang diperlukan aplikasi. Penggunaan nilai konteks yang berbeda dari sumber kunci yang sama, memungkinkan penurunan kunci yang terpisah untuk tujuan yang berbeda\cite{Sun2026Tilewise}. Dalam sistem berkas terenkripsi, prinsip ini dapat dimanfaatkan untuk memisahkan kunci per berkas guna mendukung pemisahan domain (\textit{domain separation}).
+
+Penerapan derivasi kunci unik untuk setiap berkas dapat ditemukan pada fscrypt, yaitu \textit{framework} sistem berkas terenkripsi pada kernel Linux. Berdasarkan dokumentasi kernel\cite{fscrypt}, kunci utama tidak digunakan secara langsung untuk mengenkripsi berkas. Sebaliknya, kunci untuk masing-masing berkas diturunkan dari kunci utama menggunakan KDF. Pada kebijakan enkripsi versi 2, fscrypt menggunakan HKDF-SHA512 untuk proses derivasi tersebut. Penggunaan kunci yang berbeda untuk setiap berkas memungkinkan penyederhanaan pengelolaan IV karena masing-masing berkas dapat dapat digunakan sebagai dasar pembentukan IV tanpa perlu mengandalkan satu kunci yang sama untuk seluruh berkas.
+
+Pada tingkat ruang pengguna, gocryptfs\cite{gocryptfs} mengikat setiap blok data ke berkasnya menggunakan nomor blok dan ID berkas acak sepanjang 128 bit yang disimpan dalam \textit{header} berkas. Pendekatan ini menunjukkan bahwa perlindungan sistem berkas terenkripsi tidak hanya berkaitan dengan kerahasiaan isi data, tetapi juga dengan mekanisme identifikasi yang menjaga integritas struktural serta hubungan autentik antara data terenkripsi dan berkas asalnya.
+
+Berdasarkan penelitian dan implementasi tersebut, isolasi kunci dan konteks enkripsi (\textit{Encryption Context}) merupakan dua aspek penting dalam perancangan sistem berkas terenkripsi. Meskipun demikian, fscrypt dan gocryptfs menerapkan pendekatan yang berbeda sesuai dengan tingkat di mana sistem berkas berjalan. Penelitian ini mengintegrasikan prinsip-prinsip tersebut ke dalam sistem berkas terenkripsi berbasis ruang pengguna melalui tiga mekanisme utama. Pertama, \textit{master key} dilindungi menggunakan mekanisme pembungkusan kunci dengan kunci pembungkus yang diturunkan dari kata sandi menggunakan Argon2id. Kedua, kunci enkripsi diturunkan secara terpisah untuk setiap berkas menggunakan HKDF dengan \textit{salt} acak per berkas. Ketiga, isi berkas dienkripsi per \textit{chunk} menggunakan AES-256-GCM, dengan data terkait tambahan (\textit{Additional Authenticated Data}, AAD) yang mengikat setiap \textit{chunk} pada identitas berkas dan posisinya. Kombinasi mekanisme tersebut dirancang untuk memisahkan fungsi kunci, membatasi penggunaan kunci pada konteks berkas tertentu, serta menyediakan perlindungan kerahasiaan dan integritas data pada tingkat \textit{chunk}.
+
+\subsection{Sintesis Penelitian Terdahulu}
+Berdasarkan penelusuran literatur, penelitian di ranah FUSE cenderung berfokus pada optimisasi performa, sedangkan penelitian AES-GCM dan fungsi turunan kunci cenderung berfokus pada analisis keamanan algoritma secara terpisah. Sistem berkas terenkripsi seperti gocryptfs dan fscrypt telah menerapkan komponen yang serupa, namun evaluasi akademik yang mengukur \textit{trade-off} antara performa I/O dan keamanan data pada sistem berkas ruang pengguna secara terpadu masih terbatas. Oleh karena itu, penelitian ini mengusulkan implementasi sistem berkas terenkripsi pada ruang pengguna yang bekerja secara transparan tanpa modifikasi kernel, dengan AES-256-GCM sebagai enkripsi terautentikasi serta kombinasi Argon2id dan HKDF sebagai hierarki kunci, disertai analisis performa dan keamanannya.
+ 
+% Paket yang dibutuhkan: longtable, array, colortbl, multirow, ragged2e, amssymb
+% Letakkan di akhir \section{Tinjauan Pustaka}, setelah paragraf celah penelitian.
+% Kolom "Permasalahan" dan "Hasil" ditulis dari judul/abstrak yang diketahui.
+% Tanda [CEK] = cocokkan dengan isi paper sebelum dikumpulkan.
+
+Tabel~\ref{tab:penelitian-terkait} merangkum penelitian terkait beserta topik yang relevan dengan penelitian ini.
+
+\begingroup
+\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{3pt}
+\newlength{\tw}
+\setlength{\tw}{\dimexpr\linewidth-18\tabcolsep-10\arrayrulewidth\relax}
+\begin{longtable}{|>{\Centering\arraybackslash}p{0.04\tw}|>{\RaggedRight\arraybackslash}p{0.1\tw}|>{\Centering\arraybackslash}p{0.08\tw}|>{\RaggedRight\arraybackslash}p{0.185\tw}|>{\Centering\arraybackslash}p{0.075\tw}|>{\Centering\arraybackslash}p{0.11\tw}|>{\Centering\arraybackslash}p{0.07\tw}|>{\RaggedRight\arraybackslash}p{0.18\tw}|>{\RaggedRight\arraybackslash}p{0.16\tw}|}
+\caption{Perbandingan Penelitian Terkait}\label{tab:penelitian-terkait}\\
+\hline
+\rowcolor[HTML]{C0C0C0}
+ & & & & \multicolumn{3}{c|}{\textbf{Topik}} & & \\
+\arrayrulecolor[HTML]{C0C0C0}\cline{1-4}\cline{8-9}
+\arrayrulecolor{black}\cline{5-7}
+\rowcolor[HTML]{C0C0C0}
+\multirow{-2}{0.04\tw}{\Centering\textbf{No}} & \multirow{-2}{0.1\tw}{\RaggedRight\textbf{Peneliti}} & \multirow{-2}{0.08\tw}{\Centering\textbf{Tahun}} & \multirow{-2}{0.185\tw}{\RaggedRight\textbf{Judul}} & \textbf{FUSE} & \textbf{AES/GCM} & \textbf{Kunci} & \multirow{-2}{0.18\tw}{\RaggedRight\textbf{Permasalahan}} & \multirow{-2}{0.16\tw}{\RaggedRight\textbf{Hasil}} \\
+\hline
+\endfirsthead
+
+\caption[]{Perbandingan Penelitian Terkait (lanjutan)}\\
+\hline
+\rowcolor[HTML]{C0C0C0}
+ & & & & \multicolumn{3}{c|}{\textbf{Topik}} & & \\
+\arrayrulecolor[HTML]{C0C0C0}\cline{1-4}\cline{8-9}
+\arrayrulecolor{black}\cline{5-7}
+\rowcolor[HTML]{C0C0C0}
+\multirow{-2}{0.04\tw}{\Centering\textbf{No}} & \multirow{-2}{0.1\tw}{\RaggedRight\textbf{Peneliti}} & \multirow{-2}{0.08\tw}{\Centering\textbf{Tahun}} & \multirow{-2}{0.185\tw}{\RaggedRight\textbf{Judul}} & \textbf{FUSE} & \textbf{AES/GCM} & \textbf{Kunci} & \multirow{-2}{0.18\tw}{\RaggedRight\textbf{Permasalahan}} & \multirow{-2}{0.16\tw}{\RaggedRight\textbf{Hasil}} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+1 & Biryukov dkk. & 2021 & \textit{Argon2 Memory-Hard Function for Password Hashing and Proof-of-Work Applications (RFC 9106)}\cite{RFC9106} & & & $\checkmark$ &
+Kata sandi berentropi rendah rentan terhadap \textit{brute-force} berbasis GPU/ASIC sehingga memerlukan spesifikasi baku. &
+Spesifikasi Argon2 (Argon2d, Argon2i, Argon2id) dengan parameter memori, waktu, dan paralelisme. \\ \hline
+
+2 & Huai dkk. & 2021 & \textit{XFUSE: An Infrastructure for Running Filesystem Services in User Space}\cite{Huai2021XFUSEAI} & $\checkmark$ & & &
+Layanan sistem berkas di ruang pengguna memerlukan infrastruktur yang efisien pada skala besar. &
+Infrastruktur XFUSE untuk menjalankan layanan sistem berkas di ruang pengguna \textit{[CEK]}. \\ \hline
+
+3 & Faria dkk. & 2021 & \textit{BDUS: Implementing Block Devices in User Space}\cite{Faria2021BDUS:} & $\checkmark$ & & &
+Pengembangan \textit{block device} di kernel sulit dan berisiko. &
+Kerangka kerja BDUS untuk membangun \textit{block device} di ruang pengguna. \\ \hline
+
+4 & Lembke dkk. & 2022 & \textit{DEFUSE: An Interface for Fast and Correct User Space File System Access}\cite{Lembke2022DEFUSE:} & $\checkmark$ & & &
+Akses ke sistem berkas ruang pengguna lambat, sementara kecepatan tidak boleh mengorbankan kebenaran akses. &
+Antarmuka akses yang cepat sekaligus benar \textit{[CEK mekanisme]}. \\ \hline
+
+5 & Holtrop & 2022 & \textit{Linker-Directive Based File System in Userspace: Introducing LDP FUSE}\cite{Holtrop2022LDPFUSE} & $\checkmark$ & & &
+\textit{Overhead} FUSE akibat \textit{context switch} dan penyalinan data. &
+Pengenalan LDP FUSE berbasis \textit{linker directive} \textit{[CEK; skripsi S1]}. \\ \hline
+
+6 & Zou dkk. & 2022 & \textit{User-level Parallel File System: Case Studies and Performance Optimizations}\cite{Zou2022UserLevel} & $\checkmark$ & & &
+Sistem berkas paralel tingkat pengguna memiliki keterbatasan performa. &
+Studi kasus dan optimisasi performa sistem berkas paralel tingkat pengguna. \\ \hline
+
+7 & Saarinen & 2022 & \textit{WrapQ: Side-Channel Secure Key Management for Post-Quantum Cryptography}\cite{cryptoeprint:2022/1499} &  &  & $\checkmark$ &
+Kunci PQC perlu disimpan di luar modul aman sehingga kerahasiaan dan integritasnya harus dilindungi. &
+WrapQ, mekanisme pembungkusan kunci yang melindungi kerahasiaan dan integritas kunci \textit{[CEK; fokus perangkat keras PQC, ePrint]}. \\ \hline
+
+8 & Rahma & 2022 & \textit{Proposed New Modification of AES Algorithm for Data Security}\cite{Rahma2022Proposed} & & $\checkmark$ & &
+Kebutuhan peningkatan keamanan data pada algoritma AES. &
+Usulan modifikasi algoritma AES \textit{[CEK]}. \\ \hline
+
+9 & Taufiqqurrachman \& Elsandi & 2022 & \textit{Security Analysis and Encryption Time Comparison Description on Cryptography Advanced Encryption Standard (AES)}\cite{Taufiqqurrachman2022Security} & & $\checkmark$ & &
+Pemilihan AES perlu mempertimbangkan keamanan dan waktu enkripsi. &
+Analisis keamanan dan perbandingan waktu enkripsi AES. \\ \hline
+
+10 & Shazhaq dkk. & 2023 & \textit{Analisa Penyandian File Dokumen Kriptografi Menggunakan Advanced Encryption Standard (AES)}\cite{Shazhaq2023Analisa} & & $\checkmark$ & &
+Pengamanan berkas dokumen dari akses tidak sah. &
+Analisis penyandian berkas dokumen dengan AES \textit{[CEK]}. \\ \hline
+
+11 & Khashan dkk. & 2023 & \textit{Dynamic Multimedia Encryption Using a Parallel File System Based on Multi-Core Processors}\cite{Khashan2023Dynamic} & $\checkmark$ & & &
+Sistem berkas terenkripsi berbasis FUSE memproses enkripsi secara sekuensial sehingga lambat dan tidak memanfaatkan CPU \textit{multi-core}. &
+ParallelFS mengenkripsi sub-blok secara paralel (Blowfish-CTR); lebih cepat dari EncFS dan ImgFS, dengan proses kriptografi sekitar 70--75\% dari waktu operasi. \\ \hline
+
+12 & Mattsson & 2024 & \textit{Collision Attacks on Galois/Counter Mode (GCM)}\cite{Mattsson2024Collision} & & $\checkmark$ & &
+Keamanan GCM terhadap serangan tumbukan (\textit{collision}), terutama pada IV acak. &
+GCM dengan IV acak 96-bit memberikan keamanan di bawah 97 bit \textit{[CEK]}. \\ \hline
+
+13 & Fedorchenko dkk. & 2024 & \textit{Password Hashing Methods and Algorithms on the .NET Platform}\cite{Fedorchenko2024PASSWORD} &  &  & $\checkmark$ &
+Algoritma hash cepat (MD5, SHA-256) tidak melindungi dari serangan \textit{brute-force} berbasis GPU. &
+Argon2 memberikan keseimbangan keamanan dan performa terbaik dibanding Bcrypt dan Scrypt. \\ \hline
+
+14 & Cho dkk. & 2024 & \textit{RFUSE: Modernizing Userspace Filesystem Framework through Scalable Kernel-Userspace Communication}\cite{ChoRFUSE} & $\checkmark$ & & &
+Komunikasi kernel--ruang pengguna pada FUSE kurang \textit{scalable}. &
+RFUSE mengurangi \textit{overhead} dan meningkatkan skalabilitas FUSE. \\ \hline
+
+15 & Chung dkk. & 2025 & \textit{Making GCM Great Again: Toward Full Security and Longer Nonces}\cite{Chung2025Making} & & $\checkmark$ & &
+Batas keamanan GCM terbatas oleh panjang \textit{nonce} dan jumlah kueri. &
+Konstruksi varian GCM dengan keamanan penuh dan \textit{nonce} lebih panjang. \\ \hline
+
+16 & Gingupalli & 2025 & \textit{KeyBlob: A Standardized Format for Secure HSM Key Transport and Storage}\cite{KeyBlob} &  &  & $\checkmark$ &
+Transport dan penyimpanan kunci antar modul keamanan memerlukan format yang terstandar \textit{[CEK]}. &
+Format KeyBlob untuk transport dan penyimpanan kunci HSM yang aman \textit{[CEK]}. \\ \hline
+
+17 & Tippe dkk. & 2025 & \textit{Evaluating Argon2 Adoption and Effectiveness in Real-World Software}\cite{Tippe2025Evaluating} &  &  & $\checkmark$ &
+Konfigurasi Argon2 di dunia nyata sering lemah dan dampaknya terhadap biaya serangan belum terukur. &
+Argon2id menurunkan tingkat kompromi untuk kata sandi kuat, tetapi kata sandi lemah tetap terkompromi (96,9--99,8\%). \\ \hline
+
+18 & Coignard \& Rygin & 2025 & \textit{Qatsi: Stateless Secret Generation via Hierarchical Memory-Hard Key Derivation}\cite{coignard2025qatsistatelesssecretgeneration} &  &  & $\checkmark$ &
+Pembangkitan rahasia yang dapat direproduksi tanpa penyimpanan persisten. &
+Penurunan kunci hierarkis berbasis Argon2id dengan lapisan konteks dari satu rahasia induk. \\ \hline
+
+19 & Spoorthy dkk. & 2025 & \textit{Design and Implementation of AES Encryption and Decryption for 45nm Technology}\cite{Spoorthy2025Design} & & $\checkmark$ & &
+Kebutuhan implementasi AES yang efisien pada perangkat keras. &
+Desain dan implementasi enkripsi-dekripsi AES pada teknologi 45nm \textit{[CEK]}. \\ \hline
+
+20 & Anh dkk. & 2026 & \textit{Refining Galois/Counter Mode for 256-Bit Blocks: Multilinear Authentication and Security Proofs}\cite{Anh2026Refining} & & $\checkmark$ & &
+GCM standar dirancang untuk blok 128-bit. &
+Varian GCM untuk blok 256-bit dengan autentikasi multilinear dan bukti keamanan. \\ \hline
+
+21 & Fischlin \& Schmalz & 2026 & \textit{Quantum-Resistant Authenticated Encryption Variants of GCM}\cite{Fischlin2026QuantumResistant} & & $\checkmark$ & &
+Keamanan GCM terhadap adversari kuantum. &
+Varian \textit{authenticated encryption} dari GCM yang tahan serangan kuantum \textit{[CEK]}. \\ \hline
+
+22 & Sun dkk. & 2026 & \textit{Tilewise Domain-Separated Selective Encryption for Remote Sensing Imagery under Chosen-Plaintext Attacks}\cite{Sun2026Tilewise} &  &  & $\checkmark$ &
+Transformasi rahasia yang dipakai ulang antar posisi menyebabkan kebocoran struktural antar-\textit{tile}. &
+Kunci per-\textit{tile} dari HKDF dengan \textit{domain separation} mengurangi transfer informasi antar posisi. \\ \hline
+
+\rowcolor[HTML]{EEEEEE}
+23 & \textbf{Penelitian ini} & 2026 & Implementasi Sistem Berkas Ruang Pengguna Terenkripsi Menggunakan FUSE dengan AES-256-GCM, Argon2id, dan HKDF & $\checkmark$ & $\checkmark$ & $\checkmark$ &
+Sistem berkas ruang pengguna perlu pengamanan data yang transparan dengan pengelolaan kunci dan IV yang cermat. &
+\textit{[diisi setelah pengujian]} \\ \hline
+\end{longtable}
+\endgroup
+
+% DASAR TEORI %
 \section{Dasar Teori}
 Landasan teori pada penelitian ini disusun sebagai dasar dalam pengembangan implementasi sistem berkas ruang pengguna terenkripsi menggunakan Filesystem in Userspace (FUSE). Pemahaman terhadap konsep FUSE menjadi poin penting dalam menyusun mekanisme intersepsi operasi berkas pada level ruang pengguna, sehingga proses enkripsi dan dekripsi data dapat dilakukan secara transparan tanpa memerlukan modifikasi pada kernel sistem operasi. Pemahaman mengenai konsep kriptografi, khususnya Advanced Encryption Standard (AES) sebagai algoritma enkripsi simetris, serta Argon2id dan HKDF sebagai mekanisme turunan kunci (key derivation), juga diperlukan untuk mendukung proses implementasi dan evaluasi keamanan sistem yang dibangun pada penelitian ini.
 
 Penelitian ini juga mengacu pada teori mengenai prinsip dasar kriptografi sebagai landasan dalam menjamin kerahasiaan (confidentiality) data yang disimpan pada media penyimpanan. Parameter keamanan seperti kekuatan kunci, ketahanan terhadap serangan brute-force, serta efisiensi proses enkripsi dan dekripsi menjadi aspek penting dalam mengevaluasi kualitas sistem berkas terenkripsi yang dibangun. Dengan mengacu pada teori-teori yang relevan, penelitian ini bertujuan untuk menghasilkan sistem berkas ruang pengguna yang tidak hanya mampu mengamankan data secara transparan, tetapi juga dapat memberikan analisis performa dan keamanan yang sesuai untuk implementasi pengamanan pada media penyimpanan data berbasis FUSE.
 
 \subsection{Filesystem in Userspace}
-Filesystem in Userspace (FUSE) merupakan kerangka kerja yang memungkinkan implementasi sistem berkas di ruang pengguna (userspace) alih-alih di dalam kernel sistem operasi\cite{Rietveld2022Opleiding}. Pendekatan arsitektur ini dipilih sebagai solusi alternatif atas tingginya kompleksitas tradisional dan ketatnya barrier to entry pada pengembangan filesystem berbasis kernel, yang menuntut akurasi ekstrem terhadap stabilitas sistem serta keamanan kode\cite{ChoRFUSE}. Dengan memindahkan logika filesystem ke userspace, FUSE memudahkan proses pengembangan, debugging, pemeliharaan, dan prototyping, sekaligus memberi akses pada pustaka userspace dan meningkatkan portabilitas\cite{Lembke2022DEFUSE:}.
+Filesystem in Userspace (FUSE) merupakan kerangka kerja yang memungkinkan implementasi sistem berkas di ruang pengguna (userspace) alih-alih di dalam kernel sistem operasi\cite{Holtrop2022LDPFUSE}. Pendekatan arsitektur ini dipilih sebagai solusi alternatif atas tingginya kompleksitas tradisional dan ketatnya barrier to entry pada pengembangan filesystem berbasis kernel, yang menuntut akurasi ekstrem terhadap stabilitas sistem serta keamanan kode\cite{ChoRFUSE}. Dengan memindahkan logika filesystem ke userspace, FUSE memudahkan proses pengembangan, debugging, pemeliharaan, dan prototyping, sekaligus memberi akses pada pustaka userspace dan meningkatkan portabilitas\cite{Lembke2022DEFUSE:}.
 
-Secara arsitektural, FUSE menjembatani aplikasi dan filesystem userspace melalui VFS linux, modul kernel FUSE, dan daemon userspace. Modul kernel FUSE mendaftarkan driver filesystem pada VFS Linux dan mengekspos /dev/fuse sebagai kanal komunikasi dengan daemon di userspace. Saat aplikasi memanggil operasi seperti \texttt{open}, \texttt{read}, atau \texttt{write}, request terlebih dahulu masuk ke VFS, diteruskan ke driver FUSE, ditulis ke \texttt{/dev/fuse}, lalu dibaca dan diproses oleh daemon userspace sebelum hasilnya dikirim kembali ke kernel dan aplikasi. Pada Linux, filesystem FUSE yang di-mount memang berjalan sebagai proses userspace, sehingga implementasi logika seperti path, pemetaan metadata, atau enkripsi dapat ditempatkan sepenuhnya di daemon tersebut\cite{YanDefuse}. Alur request FUSE dapat diringkas sebagai proses berantai dari aplikasi ke VFS, ke modul kernel FUSE, ke daemon userspace, lalu kembali lagi ke pemanggil.
+Secara arsitektural, FUSE menjembatani aplikasi dan filesystem userspace melalui VFS linux, modul kernel FUSE, dan \textit{daemon} userspace. Modul kernel FUSE mendaftarkan driver filesystem pada VFS Linux dan mengekspos /dev/fuse sebagai kanal komunikasi dengan \textit{daemon} di userspace. Saat aplikasi memanggil operasi seperti \texttt{open}, \texttt{read}, atau \texttt{write}, \textit{request} terlebih dahulu masuk ke VFS, diteruskan ke driver FUSE, ditulis ke \texttt{/dev/fuse}, lalu dibaca dan diproses oleh \textit{daemon} userspace sebelum hasilnya dikirim kembali ke kernel dan aplikasi. Pada Linux, filesystem FUSE yang di-mount memang berjalan sebagai proses userspace, sehingga implementasi logika seperti path, pemetaan metadata, atau enkripsi dapat ditempatkan sepenuhnya di \textit{daemon} tersebut\cite{YanDefuse}. Alur \textit{request} FUSE dapat diringkas sebagai proses berantai dari aplikasi ke VFS, ke modul kernel FUSE, ke \textit{daemon} userspace, lalu kembali lagi ke pemanggil.
 
 Diagram alur FUSE
 
 Keunggulan utama FUSE terletak pada fleksibilitas pengembangan yang dimiliki. Non-privileged user dapat membangun filesystem tanpa memodifikasi kernel melalui antarmuka yang stabil sehingga pendekatan ini cocok untuk membangun filesystem kustom, stackable, atau eksperimental\cite{Zou2022UserLevel}. Penelitian lain juga menekankan bahwa pendekatan userspace meningkatkan isolasi dan reliabilitas karena gangguan pada logika filesystem tidak langsung mempengaruhi kernel\cite{ChoRFUSE}.
 
-Adapun kelemahan utama FUSE adalah overhead performa yang dihasilkan. Sebagian besar penelitian sepakat bahwa FUSE menambah beban pada context switch, penyalinan data, dan alur I/O yang lebih panjang daripada filesystem kernel-native\cite{Rietveld2022Opleiding}. Mekanisme forwarding semua request ke daemon userspace merupakan akar utama yang menimbulkan overhead tersebut, terutama saat operasi data atau metadata dengan frekuensi tinggi\cite{Rietveld2022Opleiding}. Besarnya penalti kinerja tersebut sangat bergantung pada workload. Studi skala besar melaporkan degradasi throughput dari nyaris tak terlihat hingga -83\%, latensi operasi bisa naik sampai 4 kali lipat, CPU utilization bisa naik hingga 31\%, dan bandwidth disk terpakai -80\% lebih rendah dibanding ext4\cite{}. Meski demikian, bukti yang ditemukan tidak sepenuhnya negatif, beberapa workload data-intensif menunjukkan dampak yang kecil dan beberapa studi menyimpulkan FUSE tetap layak untuk produksi bila karakteristik bebannya disesuaikan\cite{ChoRFUSE}.
+Adapun kelemahan utama FUSE adalah overhead performa yang dihasilkan. Sebagian besar penelitian sepakat bahwa FUSE menambah beban pada context switch, penyalinan data, dan alur I/O yang lebih panjang daripada filesystem kernel-native\cite{Holtrop2022LDPFUSE}. Mekanisme forwarding semua \textit{request} ke \textit{daemon} userspace merupakan akar utama yang menimbulkan overhead tersebut, terutama saat operasi data atau metadata dengan frekuensi tinggi\cite{Holtrop2022LDPFUSE}. Besarnya penalti kinerja tersebut sangat bergantung pada workload. Studi skala besar melaporkan degradasi throughput dari nyaris tak terlihat hingga -83\%, latensi operasi bisa naik sampai 4 kali lipat, CPU utilization bisa naik hingga 31\%, dan penggunaan bandwidth disk lebih rendah hingga 80\% dibandingkan ext4\cite{}. Meski demikian, bukti yang ditemukan tidak sepenuhnya negatif, beberapa workload data-intensif menunjukkan dampak yang kecil dan beberapa studi menyimpulkan FUSE tetap layak untuk produksi bila karakteristik bebannya disesuaikan\cite{ChoRFUSE}.
 
-Pada sistem berkas terenkripsi, FUSE menjadi pondasi utama yang memungkinkan logika enkripsi-dekripsi ditempatkan secara transparan pada daemon userspace tanpa mengubah antarmuka aplikasi\cite{Lembke2022DEFUSE:}. Dalam praktiknya, operasi seperti \texttt{read} dan \texttt{write} menjadi titik integrasi alami untuk dekripsi sebelum data dikembalikan ke aplikasi dan enkripsi sebelum data diteruskan ke storage backend. Sebuah penelitian mengenai FUSE sebagai customized filesystem menunjukkan bahwa request memang diterjemahkan dan diproses oleh daemon userspace sebelum mengakses filesystem dasar.
+Pada sistem berkas terenkripsi, FUSE menjadi pondasi utama yang memungkinkan logika enkripsi-dekripsi ditempatkan secara transparan pada \textit{daemon} userspace tanpa mengubah antarmuka aplikasi\cite{Lembke2022DEFUSE:}. Dalam praktiknya, operasi seperti \texttt{read} dan \texttt{write} menjadi titik integrasi alami untuk dekripsi sebelum data dikembalikan ke aplikasi dan enkripsi sebelum data diteruskan ke storage backend. Sebuah penelitian mengenai FUSE sebagai customized filesystem menunjukkan bahwa \textit{request} memang diterjemahkan dan diproses oleh \textit{daemon} userspace sebelum mengakses filesystem dasar.
 
-Implementasi arsitektur desain ini secara inheren melibatkan kompromi teknis (trade-off) yang signifikan. Penempatan logika keamanan pada userspace mempermudah proses implementasi serta pengujian eksperimental; namun, setiap operasi instruksi baca-tulis (read-write) harus menanggung beban overhead dari arsitektur FUSE. Akibatnya, performa sistem akhir menjadi sangat sensitif terhadap frekuensi I/O, ukuran request, serta intensitas operasi metadata\cite{Huai2021XFUSEAI,Faria2021BDUS:}. Karena itu, banyak penelitian yang telah dilakukan untuk optimisasi FUSE yang berfokus pada pengurangan perpindahan konteks atau penyalinan request, misalnya dengan menerapkan bypass pada sebagian jalur data, memisahkan data dan metadata, menggunakan ring buffer per-core, atau bahkan menghilangkan intervensi FUSE pada jalur tertentu\cite{ChoRFUSE,Lembke2022DEFUSE:,Zou2022UserLevel,YanDefuse}.
+Implementasi arsitektur desain ini secara inheren melibatkan kompromi teknis (trade-off) yang signifikan. Penempatan logika keamanan pada userspace mempermudah proses implementasi serta pengujian eksperimental; namun, setiap operasi instruksi baca-tulis (read-write) harus menanggung beban overhead dari arsitektur FUSE. Akibatnya, performa sistem akhir menjadi sangat sensitif terhadap frekuensi I/O, ukuran \textit{request}, serta intensitas operasi metadata\cite{Huai2021XFUSEAI,Faria2021BDUS:}. Karena itu, banyak penelitian yang telah dilakukan untuk optimisasi FUSE yang berfokus pada pengurangan perpindahan konteks atau penyalinan \textit{request}, misalnya dengan menerapkan bypass pada sebagian jalur data, memisahkan data dan metadata, menggunakan ring buffer per-core, atau bahkan menghilangkan intervensi FUSE pada jalur tertentu\cite{ChoRFUSE,Lembke2022DEFUSE:,Zou2022UserLevel,YanDefuse}.
 
-Untuk penelitian ini, FUSE dapat dirumuskan sebagai pendekatan implementasi sistem berkas yang menempatkan logika utama di ruang pengguna melalui perantara VFS, modul kernel FUSE, dan daemon userspace. Pendekatan ini mempudahkan pengembangan sistem berkas terenkripsi, tetapi menghasilkan trade-off performa akibat adanya context switch dan penyalinan data tambahan yang harus dipertimbangkan pada desain akhir.
+Untuk penelitian ini, FUSE dapat dirumuskan sebagai pendekatan implementasi sistem berkas yang menempatkan logika utama di ruang pengguna melalui perantara VFS, modul kernel FUSE, dan \textit{daemon} userspace. Pendekatan ini mempermudah pengembangan sistem berkas terenkripsi, tetapi menghasilkan trade-off performa akibat adanya context switch dan penyalinan data tambahan yang harus dipertimbangkan pada desain akhir.
 
 \subsection{Kriptografi}
 Kriptografi merupakan ilmu dan seni untuk mengamankan informasi dengan cara mengubah data asli (plaintext) menjadi teks sandi (ciphertext) sehingga tidak dapat dibaca atau dipahami oleh pihak yang tidak berwenang\cite{}. Dalam konteks modern, kriptografi juga dipahami sebagai studi tentang teknik dan protokol untuk komunikasi yang mengamankan dari keberadaan pihak ketiga atau adversary\cite{}. Proses tersebut dilakukan melalui algoritma kriptografi yang melibatkan penggunaan kunci untuk enkripsi dan dekripsi.
 
-Tujuan utama kriptografi adalah untuk menyediakan kerahasiaan, integritas, autentikasi, dan nirpenyangkalan pada suatu informasi\cite{}. Kerahasiaan menjamin bahwa informasi hanya dapat dibaca oleh pihak yang berwenang\cite{}. Integritas menjamin bahwa data tidak diubah secara tidak sah dan bahwa manipulasi seperti penyisipan, penghapusan, atau substitusi dapat dideteksi\cite{}. Autentikasi berkaitan dengan pembuktian identitas dari entitas dan asal data\cite{}. Nirpenyangkalan menchegah suatu pihak menyangkal tindakan atau pesan yang sebelumnya telah dibuat atau dikirim\cite{}.
+Tujuan utama kriptografi adalah untuk menyediakan kerahasiaan, integritas, autentikasi, dan nirpenyangkalan pada suatu informasi\cite{}. Kerahasiaan menjamin bahwa informasi hanya dapat dibaca oleh pihak yang berwenang\cite{}. Integritas menjamin bahwa data tidak diubah secara tidak sah dan bahwa manipulasi seperti penyisipan, penghapusan, atau substitusi dapat dideteksi\cite{}. Autentikasi berkaitan dengan pembuktian identitas dari entitas dan asal data\cite{}. Nirpenyangkalan mencegah suatu pihak menyangkal tindakan atau pesan yang sebelumnya telah dibuat atau dikirim\cite{}.
 
 Gambar segitiga CIA + Nirpenyangkalan
 
@@ -48,7 +209,7 @@ Dalam kriptografi simetris, terdapat dua kategori utama, yaitu block cipher dan 
 Stream cipher mengenkripsi data secara bertahap dengan membangkitkan keystream yang kemudian dikombinasikan dengan plaintext, umumnya menggunakan XOR\cite{}. Stream cipher cenderung lebih unggul pada aliran data kontinu dan komunikasi real-time karena sederhana dan cepat\cite{}. Namun, keamanan stream cipher sangat bergantung pada penggunaan keystream yang benar dan penggunaan kembali seed atau initial state dapat menimbulkan kelemahan yang serius\cite{}.
 
 \subsection{Advanced Encryption Standard}
-Advanced Encryption Standard (AES) adalah standar algoritma enkripsi yang ditetapkan oleh National Institute of Standards and Technology (NIST)\cite{Rahma2022Proposed}. AES merupakan algoritma kriptografi simetris berbasis block cipher yang memproses data dalam blok dengan ukuran tetap, yaitu 128 bit. AES mendukung tiga panjang kunci, yaitu 128 bit, 192 bit, dan 256 bit. Perbedaan panjang kunci tersebut menentukan jumlah putaran (round) yang digunakan dalam proses enkripsi dan dekripsi.\cite{Spoorthy2025Design}
+Advanced Encryption Standard (AES) adalah standar algoritma enkripsi yang ditetapkan oleh National Institute of Standards and Technology (NIST)\cite{Rahma2022Proposed}. AES merupakan algoritma kriptografi simetris berbasis block cipher yang memproses data dalam blok dengan ukuran tetap, yaitu 128 bit. AES mendukung tiga panjang kunci, yaitu 128 bit, 192 bit, dan 256 bit. Perbedaan panjang kunci tersebut menentukan jumlah putaran (round) yang digunakan dalam proses enkripsi dan dekripsi\cite{Spoorthy2025Design}.
 
 Dalam proses enkripsi, AES memproses plaintext dalam blok berukuran 128 bit. Setiap blok tersebut direpresentasikan dalam bentuk State, yaitu array berukuran $4 \times 4$ byte\cite{Shazhaq2023Analisa}. Selanjutnya, State mengalami serangkaian transformasi untuk menghasilkan ciphertext. Transformasi utama dalam AES meliputi SubBytes, ShiftRows, MixColumns, dan AddRoundKey. SubBytes melakukan substitusi terhadap setiap byte pada State menggunakan tabel substitusi yang disebut S-box. ShiftRows menggeser byte pada setiap baris State secara siklik dengan jumlah pergeseran yang berbeda. MixColumns melakukan pencampuran data pada setiap kolom State dengan mengalikan setiap kolom menggunakan matriks konstan yang telah ditentukan melalui operasi aritmetika pada Galois Field $GF(2^8)$. Sementara itu, AddRoundKey menggabungkan State dengan Round Key yang sesuai menggunakan operasi XOR. Round Key tersebut dihasilkan dari Cipher Key melalui proses Key Expansion. Sebelum round pertama, dilakukan AddRoundKey awal. Selanjutnya, transformasi utama diterapkan dalam beberapa round sesuai dengan panjang kunci. Pada round terakhir, transformasi MixColumns tidak dilakukan\cite{Taufiqqurrachman2022Security}.
 
@@ -64,7 +225,7 @@ Berdasarkan panjang kunci yang digunakan, Advanced Encryption Standard (AES) dik
 
 Untuk mengenkripsi data yang terdiri atas banyak blok, AES digunakan bersama mode operasi yang menentukan bagaimana blok-blok tersebut diproses. Salah satu mode operasi yang umum digunakan adalah Galois/Counter Mode (GCM). GCM merupakan mode operasi untuk block cipher kunci simetris yang menyediakan enkripsi sekaligus autentikasi pesan dengan memanfaatkan counter mode dan universal hashing pada medan biner. Karena itu, GCM tidak hanya menyediakan confidentiality, tetapi juga integrity dan authenticity\cite{Fischlin2026QuantumResistant}.
 
-Pada GCM, fungsi authenticated encryption menerima tiga masukan, yaitu plaintext, AAD, dan IV. GCM Melindungi kerahasiaan plaintext serta keaslian plaintext dan AAD, sementara AAD tetap tidak dienkripsi. Keluaran proses enkripsi berupa ciphertext dan authentication tag. Authentication tag dipakai saat dekripsi untuk memverifikasi integritas dan keaslian data yang diproses\cite{Anh2026Refining}.
+Pada GCM, fungsi authenticated encryption menerima tiga masukan, yaitu plaintext, AAD, dan IV. GCM melindungi kerahasiaan plaintext serta keaslian plaintext dan AAD, sementara AAD tetap tidak dienkripsi. Keluaran proses enkripsi berupa ciphertext dan authentication tag. Authentication tag dipakai saat dekripsi untuk memverifikasi integritas dan keaslian data yang diproses\cite{Anh2026Refining}.
 
 \begin{figure}[H]
     \centering

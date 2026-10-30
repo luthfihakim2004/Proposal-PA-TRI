@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026 Gentoo Linux) (preloaded format=pdflatex 2026.10.18)  26 OCT 2026 18:41
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026 Gentoo Linux) (preloaded format=pdflatex 2026.10.18)  31 OCT 2026 01:37
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1013,8 +1013,57 @@ File: pgflibraryarrows.meta.code.tex 2026-08-01 v3.1.12 (3.1.12)
 (/usr/share/texmf-site/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrary
 positioning.code.tex
 File: tikzlibrarypositioning.code.tex 2026-08-01 v3.1.12 (3.1.12)
-)) (./chapters/database.hyphenate.tex) (./Proposal PA.aux
-(./chapters/sampul.aux) (./chapters/pengesahan.aux) (./chapters/daftarisi.aux)
+) (/usr/share/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2026-01-28 v4.27 Multi-page Table package (DPC)
+\LTleft=\skip134
+\LTright=\skip135
+\LTpre=\skip136
+\LTpost=\skip137
+\LTchunksize=\count388
+\LTcapwidth=\dimen346
+\LT@head=\box82
+\LT@firsthead=\box83
+\LT@foot=\box84
+\LT@lastfoot=\box85
+\LT@gbox=\box86
+\LT@cols=\count389
+\LT@rows=\count390
+\c@LT@tables=\count391
+\c@LT@chunks=\count392
+\LT@p@ftn=\toks54
+)
+(/usr/share/texmf-dist/tex/latex/ragged2e/ragged2e.sty
+Package: ragged2e 2023/06/22 v3.6 ragged2e Package
+\CenteringLeftskip=\skip138
+\RaggedLeftLeftskip=\skip139
+\RaggedRightLeftskip=\skip140
+\CenteringRightskip=\skip141
+\RaggedLeftRightskip=\skip142
+\RaggedRightRightskip=\skip143
+\CenteringParfillskip=\skip144
+\RaggedLeftParfillskip=\skip145
+\RaggedRightParfillskip=\skip146
+\JustifyingParfillskip=\skip147
+\CenteringParindent=\skip148
+\RaggedLeftParindent=\skip149
+\RaggedRightParindent=\skip150
+\JustifyingParindent=\skip151
+))
+(/usr/share/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/share/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup5
+\symAMSb=\mathgroup6
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)
+LaTeX Font Info:    Redeclaring math symbol \boxdot on input line 44.
+)
+(./chapters/database.hyphenate.tex) (./Proposal PA.aux (./chapters/sampul.aux)
+(./chapters/pengesahan.aux) (./chapters/daftarisi.aux)
 (./chapters/daftargambar.aux) (./chapters/daftartabel.aux)
 (./chapters/abstrak.aux) (./chapters/bab1.aux) (./chapters/bab2.aux)
 (./chapters/bab3.aux) (./chapters/bab4.aux))
@@ -1041,17 +1090,17 @@ LaTeX Font Info:    ... okay on input line 18.
 
 (/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count388
-\scratchdimen=\dimen346
-\scratchbox=\box82
-\nofMPsegments=\count389
-\nofMParguments=\count390
-\everyMPshowfont=\toks54
-\MPscratchCnt=\count391
-\MPscratchDim=\dimen347
-\MPnumerator=\count392
-\makeMPintoPDFobject=\count393
-\everyMPtoPDFconversion=\toks55
+\scratchcounter=\count393
+\scratchdimen=\dimen347
+\scratchbox=\box87
+\nofMPsegments=\count394
+\nofMParguments=\count395
+\everyMPshowfont=\toks55
+\MPscratchCnt=\count396
+\MPscratchDim=\dimen348
+\MPnumerator=\count397
+\makeMPintoPDFobject=\count398
+\everyMPtoPDFconversion=\toks56
 ) (/usr/share/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
@@ -1063,10 +1112,15 @@ e
 ))
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: changepage package is loaded.
-\caption@adjustwidth@hsize=\dimen348
-\caption@adjustwidth@linewidth=\dimen349
+\caption@adjustwidth@hsize=\dimen349
+\caption@adjustwidth@linewidth=\dimen350
 Package caption Info: hyperref package is loaded.
 Package caption Info: listings package is loaded.
+Package caption Info: longtable package is loaded.
+
+(/usr/share/texmf-dist/tex/latex/caption/ltcaption.sty
+Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
+)
 Package caption Info: rotating package is loaded.
 Package caption Info: wrapfig package is loaded.
 Package caption Info: End \AtBeginDocument code.
@@ -1105,7 +1159,7 @@ Package caption Info: End \AtBeginDocument code.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-\c@lstlisting=\count394
+\c@lstlisting=\count399
 Package hyperref Info: Link coloring OFF on input line 18.
 (./Proposal PA.out) (./Proposal PA.out)
 \@outlinefile=\write4
@@ -1115,7 +1169,7 @@ Package babel Info: Main language set to 'indonesian'.
 \openout2 = `chapters/sampul.aux'.
 
  (./chapters/sampul.tex
-<gambar/logo-ugm.png, id=155, 290.7663pt x 305.4612pt>
+<gambar/logo-ugm.png, id=187, 290.7663pt x 305.4612pt>
 File: gambar/logo-ugm.png Graphic file (type png)
 <use gambar/logo-ugm.png>
 Package pdftex.def Info: gambar/logo-ugm.png  used on input line 9.
@@ -1123,31 +1177,48 @@ Package pdftex.def Info: gambar/logo-ugm.png  used on input line 9.
 LaTeX Font Info:    Trying to load font information for U+stmry on input line 1
 3.
 
-(/usr/share/texmf-dist/tex/latex/stmaryrd/Ustmry.fd) [1
+(/usr/share/texmf-dist/tex/latex/stmaryrd/Ustmry.fd)
+LaTeX Font Info:    Trying to load font information for U+msa on input line 13.
+
+
+(/usr/share/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 13.
+
+
+(/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) [1
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./gambar/logo-ugm.png>])
 \openout2 = `chapters/pengesahan.aux'.
 
-
-(./chapters/pengesahan.tex [1
+ (./chapters/pengesahan.tex
+[1
 
 
 
 ]) [2]
 \openout2 = `chapters/daftarisi.aux'.
 
- (./chapters/daftarisi.tex
-(./Proposal PA.toc [3
+ (./chapters/daftarisi.tex (./Proposal PA.toc [3
 
 
 
 
-])
+]
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 4
+3.
+
+(/usr/share/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+))
 \tf@toc=\write5
 \openout5 = `"Proposal PA.toc"'.
 
-) [4]
+) [4{/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc}]
 \openout2 = `chapters/daftargambar.aux'.
 
  (./chapters/daftargambar.tex (./Proposal PA.lof)
@@ -1220,52 +1291,147 @@ Bab 2.
 
 
 
-]
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 1
-9.
- (/usr/share/texmf-dist/tex/latex/psnfss/ot1pcr.fd
-File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-) [5{/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc}] [6] [7] (./gambar/aes-
-diagram.tex) [8] [9]
-<gambar/aesgcm.png, id=341, 987.69pt x 562.1pt>
+] [5] [6] [7]
+\tw=\skip152
+
+Overfull \hbox (0.83685pt too wide) in paragraph at lines 58--58
+ []|\OT1/cmr/bx/n/10 Tahun| 
+ []
+
+
+Overfull \hbox (1.30244pt too wide) in paragraph at lines 58--58
+ []|\OT1/cmr/bx/n/10 FUSE| 
+ []
+
+
+Overfull \hbox (14.52028pt too wide) in paragraph at lines 58--58
+ []|\OT1/cmr/bx/n/10 AES/GCM| 
+ []
+
+
+Overfull \hbox (3.28302pt too wide) in paragraph at lines 58--58
+ []|\OT1/cmr/bx/n/10 Kunci| 
+ []
+
+
+Overfull \hbox (1.06055pt too wide) in paragraph at lines 58--58
+[]|\OT1/cmr/bx/n/10 Permasalahan|  
+ []
+
+
+Overfull \hbox (0.83685pt too wide) in paragraph at lines 69--69
+ []|\OT1/cmr/bx/n/10 Tahun| 
+ []
+
+
+Overfull \hbox (1.30244pt too wide) in paragraph at lines 69--69
+ []|\OT1/cmr/bx/n/10 FUSE| 
+ []
+
+
+Overfull \hbox (14.52028pt too wide) in paragraph at lines 69--69
+ []|\OT1/cmr/bx/n/10 AES/GCM| 
+ []
+
+
+Overfull \hbox (3.28302pt too wide) in paragraph at lines 69--69
+ []|\OT1/cmr/bx/n/10 Kunci| 
+ []
+
+
+Overfull \hbox (1.06055pt too wide) in paragraph at lines 69--69
+[]|\OT1/cmr/bx/n/10 Permasalahan|  
+ []
+
+
+Overfull \hbox (1.30713pt too wide) in paragraph at lines 76--76
+[]|\OT1/cmr/m/n/10 Biryukov 
+ []
+
+
+Overfull \hbox (4.04927pt too wide) in paragraph at lines 102--102
+\OT1/cmr/m/n/10 pem-bung-kus-an 
+ []
+
+
+Overfull \hbox (41.75162pt too wide) in paragraph at lines 108--108
+[]|\OT1/cmr/m/n/10 Taufiqqurrachman 
+ []
+
+
+Overfull \hbox (17.47652pt too wide) in paragraph at lines 109--109
+\OT1/cmr/m/n/10 mem-per-tim-bangk-an 
+ []
+
+
+Overfull \hbox (2.08487pt too wide) in paragraph at lines 120--120
+[]|\OT1/cmr/m/n/10 Mattsson|  
+ []
+
+
+Overfull \hbox (16.02933pt too wide) in paragraph at lines 124--124
+[]|\OT1/cmr/m/n/10 Fedorchenko 
+ []
+
+
+Overfull \hbox (7.32101pt too wide) in paragraph at lines 136--136
+[]|\OT1/cmr/m/n/10 Gingupalli|  
+ []
+
+
+Overfull \hbox (1.72377pt too wide) in paragraph at lines 144--144
+[]|\OT1/cmr/m/n/10 Coignard 
+ []
+
+
+Overfull \hbox (1.7238pt too wide) in paragraph at lines 148--148
+[]|\OT1/cmr/m/n/10 Spoorthy 
+ []
+
+
+Overfull \hbox (12.20256pt too wide) in paragraph at lines 165--165
+[]|\OT1/cmr/bx/n/10 Penelitian 
+ []
+
+[8] [9] [10] [11] [12] [13] [14] [15] [16] [17] [18] (./gambar/aes-diagram.tex)
+[19] [20]
+<gambar/aesgcm.png, id=503, 987.69pt x 562.1pt>
 File: gambar/aesgcm.png Graphic file (type png)
 <use gambar/aesgcm.png>
-Package pdftex.def Info: gambar/aesgcm.png  used on input line 71.
+Package pdftex.def Info: gambar/aesgcm.png  used on input line 232.
 (pdftex.def)             Requested size: 352.81552pt x 200.78625pt.
-
-[10 <./gambar/aesgcm.png>] [11] [12]
-<gambar/diagram.png, id=365, 797.74036pt x 257.5221pt>
+ [21 <./gambar/aesgcm.png>] [22] [23]
+<gambar/diagram.png, id=523, 797.74036pt x 257.5221pt>
 File: gambar/diagram.png Graphic file (type png)
 <use gambar/diagram.png>
-Package pdftex.def Info: gambar/diagram.png  used on input line 124.
+Package pdftex.def Info: gambar/diagram.png  used on input line 285.
 (pdftex.def)             Requested size: 352.81552pt x 113.89555pt.
- [13]) [14 <./gambar/diagram.png>]
+ [24]) [25 <./gambar/diagram.png>]
 \openout2 = `chapters/bab3.aux'.
 
-
-(./chapters/bab3.tex
+ (./chapters/bab3.tex
 Bab 3.
-<gambar/flowchart.png, id=379, 612.2875pt x 1400.23125pt>
+<gambar/flowchart.png, id=536, 612.2875pt x 1400.23125pt>
 File: gambar/flowchart.png Graphic file (type png)
 <use gambar/flowchart.png>
 Package pdftex.def Info: gambar/flowchart.png  used on input line 8.
 (pdftex.def)             Requested size: 176.40439pt x 403.4073pt.
-[15
+[26
 
 
 
 
-] [16 <./gambar/flowchart.png>]
+] [27 <./gambar/flowchart.png>]
 File: gambar/flowchart.png Graphic file (type png)
 <use gambar/flowchart.png>
 Package pdftex.def Info: gambar/flowchart.png  used on input line 44.
 (pdftex.def)             Requested size: 176.40439pt x 403.4073pt.
- [17] [18] [19]
+ [28] [29] [30]
 Overfull \hbox (2.4778pt too wide) in paragraph at lines 124--124
  []|\OT1/cmr/bx/n/12 Level| 
  []
 
-[20]
+[31]
 Overfull \hbox (5.1881pt too wide) in paragraph at lines 196--196
  []|\OT1/pcr/m/n/12 uint8[]t[16]| 
  []
@@ -1275,62 +1441,104 @@ Overfull \hbox (5.1881pt too wide) in paragraph at lines 196--196
  []|\OT1/pcr/m/n/12 uint8[]t[24]| 
  []
 
-[21{/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}] [22]
+[32{/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}] [33]
 Overfull \hbox (16.27937pt too wide) in paragraph at lines 254--278
  [][] 
  []
 
-[23]) [24]
+[34]) [35]
 \openout2 = `chapters/bab4.aux'.
 
  (./chapters/bab4.tex
 Bab 4.
-) [25
+) [36
 
 
 
 
-] (./chapters/daftarpustaka.tex (./Proposal PA.bbl [26
+] (./chapters/daftarpustaka.tex (./Proposal PA.bbl [37
 
 
 
 
-]))
-(./chapters/lampiran.tex [27]) [1
+] [38]))
+(./chapters/lampiran.tex [39]) (./Note.tex
 
-] (./Proposal PA.aux (./chapters/sampul.aux)
-(./chapters/pengesahan.aux) (./chapters/daftarisi.aux)
-(./chapters/daftargambar.aux) (./chapters/daftartabel.aux)
-(./chapters/abstrak.aux) (./chapters/bab1.aux) (./chapters/bab2.aux)
-(./chapters/bab3.aux) (./chapters/bab4.aux))
+Package hyperref Warning: Difference (2) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 1.
+
+[1
+
+] [2]
+! Undefined control sequence.
+l.43 \toprule
+             
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Undefined control sequence.
+<recently read> \midrule 
+                         
+l.44 ...& \textbf{Bit Difference (\%)} \\ \midrule
+                                                  
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Undefined control sequence.
+<recently read> \bottomrule 
+                            
+l.48 ...3.12\%                      \\ \bottomrule
+                                                  
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+) [3] (./Proposal PA.aux (./chapters/sampul.aux) (./chapters/pengesahan.aux)
+(./chapters/daftarisi.aux) (./chapters/daftargambar.aux)
+(./chapters/daftartabel.aux) (./chapters/abstrak.aux) (./chapters/bab1.aux)
+(./chapters/bab2.aux) (./chapters/bab3.aux) (./chapters/bab4.aux))
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-08-10>
  ***********
 Package rerunfilecheck Info: File `"Proposal PA".out' has not changed.
-(rerunfilecheck)             Checksum: F415F48AEB9D978E731B4ED4F17C257A;5049.
+(rerunfilecheck)             Checksum: A4375ACD6A5F093A343BD2AFB6D45F4F;7338.
  ) 
 Here is how much of TeX's memory you used:
- 31391 strings out of 468576
- 581931 string characters out of 5446160
- 1142174 words of memory out of 5000000
- 59848 multiletter control sequences out of 15000+600000
- 635506 words of font info for 68 fonts, out of 8000000 for 9000
+ 32256 strings out of 468576
+ 593819 string characters out of 5446160
+ 1230909 words of memory out of 5000000
+ 60629 multiletter control sequences out of 15000+600000
+ 641195 words of font info for 93 fonts, out of 8000000 for 9000
  267 hyphenation exceptions out of 8191
  113i,16n,110p,2588b,779s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/
 texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fon
-ts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmmi12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr
-/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmti12.pfb></usr/share/texmf-dist/fonts/type1/public/cm-supe
-r/sfrm1200.pfb></usr/share/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb>
-Output written on "Proposal PA.pdf" (36 pages, 907228 bytes).
+ts/type1/public/amsfonts/cm/cmbxti10.pfb></usr/share/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
+/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.p
+fb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texmf-dist/fonts/type1/publi
+c/amsfonts/symbols/msam10.pfb></usr/share/texmf-dist/fonts/type1/public/cm-supe
+r/sfrm1200.pfb></usr/share/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/
+share/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb>
+Output written on "Proposal PA.pdf" (50 pages, 1040479 bytes).
 PDF statistics:
- 549 PDF objects out of 1000 (max. 8388607)
- 476 compressed objects within 5 object streams
- 137 named destinations out of 1000 (max. 500000)
- 329 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 783 PDF objects out of 1000 (max. 8388607)
+ 680 compressed objects within 7 object streams
+ 182 named destinations out of 1000 (max. 500000)
+ 393 words of extra memory for PDF output out of 10000 (max. 10000000)
 

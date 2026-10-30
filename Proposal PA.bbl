@@ -21,10 +21,6 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
-\bibitem{Rietveld2022Opleiding}
-K.~Rietveld, ``Opleiding informatica linker-directive based file system in
-  userspace: Introducing ldp fuse,'' 2022.
-
 \bibitem{ChoRFUSE}
 \BIBentryALTinterwordspacing
 K.-J. Cho, J.~Choi, H.~Kwon, and J.-S. Kim, ``{RFUSE}: Modernizing userspace
@@ -40,15 +36,14 @@ J.~Lembke, P.-L. Roman, and P.~Eugster, ``Defuse: An interface for fast and
   correct user space file system access,'' \emph{ACM Transactions on Storage
   (TOS)}, vol.~18, pp. 1 -- 29, 2022.
 
-\bibitem{YanDefuse}
-W.~Yan, J.~Yao, and Q.~Cao, ``Defuse: Decoupling metadata and data processing
-  in fuse framework for performance improvement,'' \emph{IEEE Access}, vol.~7,
-  pp. 138\,473--138\,484, 2019.
-
 \bibitem{Zou2022UserLevel}
 Y.~Zou, C.~Chen, T.~Deng, X.~Zhu, S.~Chen, and S.~Yin, ``User-level parallel
   file system: Case studies and performance optimizations,'' \emph{Concurrency
   and Computation: Practice and Experience}, vol.~34, 2022.
+
+\bibitem{Rietveld2022Opleiding}
+K.~Rietveld, ``Opleiding informatica linker-directive based file system in
+  userspace: Introducing ldp fuse,'' 2022.
 
 \bibitem{Huai2021XFUSEAI}
 \BIBentryALTinterwordspacing
@@ -63,6 +58,12 @@ A.~Faria, R.~Macedo, J.~Pereira, and J.~Paulo, ``Bdus: implementing block
   devices in user space,'' \emph{Proceedings of the 14th ACM International
   Conference on Systems and Storage}, 2021.
 
+\bibitem{Khashan2023Dynamic}
+O.~A. Khashan, N.~M. Khafajah, W.~Alomoush, M.~Alshinwan, S.~Alamri,
+  S.~Atawneh, and M.~K. Alsmadi, ``Dynamic multimedia encryption using a
+  parallel file system based on multi-core processors,'' \emph{Cryptography},
+  vol.~7, no.~1, p.~12, 2023.
+
 \bibitem{Rahma2022Proposed}
 A.~M.~S. Rahma, ``Proposed new modification of aes algorithm for data
   security,'' \emph{Global Journal of Engineering and Technology Advances},
@@ -74,25 +75,19 @@ H.~L. Spoorthy, D.~S. B, G.~S, D.~M. S, C.~G. T, and D.~M.~B. Anandaraju,
   technology,'' \emph{International Journal Of Scientific Research In
   Engineering \& Technology}, 2025.
 
-\bibitem{Shazhaq2023Analisa}
-T.~S. Shazhaq, M.~Tahir, K.~Abidin, V.~Auria, D.~Maulidia, D.~F. Mu'in, and
-  M.~Khoiruddin, ``Analisa penyandian file dokumen kriptografi menggunakan
-  advanced encryption standard (aes),'' \emph{Jurnal Kendali Teknik dan Sains},
-  2023.
-
 \bibitem{Taufiqqurrachman2022Security}
 T.~Taufiqqurrachman and D.~Elsandi, ``Security analysis and encryption time
   comparison description on cryptography advanced encryption standard (aes),''
   \emph{Jurnal Inovatif : Inovasi Teknologi Informasi dan Informatika}, 2022.
 
-\bibitem{Fischlin2026QuantumResistant}
-M.~Fischlin and T.~Schmalz, ``Quantum-resistant authenticated encryption
-  variants of gcm,'' \emph{IACR Trans. Symmetric Cryptol.}, vol. 2026, 2026.
-
 \bibitem{Anh2026Refining}
 N.~T. Anh, N.~B. Cuong, and K.~V. Dich, ``Refining galois/counter mode for
   256-bit blocks: Multilinear authentication and security proofs,''
   \emph{Journal of Science and Technology on Information Security}, 2026.
+
+\bibitem{Fischlin2026QuantumResistant}
+M.~Fischlin and T.~Schmalz, ``Quantum-resistant authenticated encryption
+  variants of gcm,'' \emph{IACR Trans. Symmetric Cryptol.}, vol. 2026, 2026.
 
 \bibitem{Chung2025Making}
 W.~Chung, S.~Hwang, S.-H. Kim, B.~Lee, and J.~Lee, ``Making gcm great again:
@@ -100,8 +95,61 @@ W.~Chung, S.~Hwang, S.-H. Kim, B.~Lee, and J.~Lee, ``Making gcm great again:
   vol. 2025, p. 577, 2025.
 
 \bibitem{Mattsson2024Collision}
+\BIBentryALTinterwordspacing
 J.~P. Mattsson, ``Collision attacks on galois/counter mode (gcm),'' \emph{IACR
-  Cryptol. ePrint Arch.}, vol. 2024, p. 1111, 2024.
+  Cryptol. ePrint Arch.}, vol. 2024, p. 1111, 2024. [Online]. Available:
+  \url{https://api.semanticscholar.org/CorpusID:271119047}
+\BIBentrySTDinterwordspacing
+
+\bibitem{KeyBlob}
+S.~C.~P. Gingupalli, ``Keyblob: A standardized format for secure hsm key
+  transport and storage,'' in \emph{2025 IEEE 2nd International Conference on
+  Cryptography, Informatics, and Cybersecurity (ICoCICs)}, 2025, pp. 118--125.
+
+\bibitem{cryptoeprint:2022/1499}
+\BIBentryALTinterwordspacing
+M.-J.~O. Saarinen, ``{WrapQ}: Side-channel secure key management for
+  post-quantum cryptography,'' Cryptology {ePrint} Archive, Paper 2022/1499,
+  2022. [Online]. Available: \url{https://eprint.iacr.org/2022/1499}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Tippe2025Evaluating}
+P.~Tippe and M.~P. Berner, ``Evaluating argon2 adoption and effectiveness in
+  real-world software,'' pp. 25--46, 2025.
+
+\bibitem{Fedorchenko2024PASSWORD}
+V.~Fedorchenko, O.~Yeroshenko, O.~Shmatko, O.~Kolomiitsev, and M.~Omarov,
+  ``Password hashing methods and algorithms on the .net platform,''
+  \emph{Advanced Information Systems}, 2024.
+
+\bibitem{coignard2025qatsistatelesssecretgeneration}
+\BIBentryALTinterwordspacing
+R.~Coignard and A.~Rygin, ``Qatsi: Stateless secret generation via hierarchical
+  memory-hard key derivation,'' 2025. [Online]. Available:
+  \url{https://arxiv.org/abs/2510.18614}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Sun2026Tilewise}
+J.-L. Sun, D.~Wu, and Y.~Su, ``Tilewise domain-separated selective encryption
+  for remote sensing imagery under chosen-plaintext attacks,'' \emph{ArXiv},
+  vol. abs/2602.23772, 2026.
+
+\bibitem{RFC5869}
+H.~Krawczyk and P.~Eronen, ``{HMAC}-based extract-and-expand key derivation
+  function ({HKDF}),'' Internet Engineering Task Force, RFC 5869, May 2010.
+
+\bibitem{fscrypt}
+{Linux Kernel Documentation}, ``Filesystem-level encryption ({fscrypt}),''
+  \url{https://docs.kernel.org/filesystems/fscrypt.html}.
+
+\bibitem{gocryptfs}
+J.~Unterwurzacher, ``gocryptfs: Encrypted overlay filesystem written in {Go},''
+  \url{https://nuetzlich.net/gocryptfs/forward_mode_crypto}.
+
+\bibitem{RFC9106}
+A.~Biryukov, D.~Dinu, D.~Khovratovich, and S.~Josefsson, ``Argon2 memory-hard
+  function for password hashing and proof-of-work applications,'' Internet
+  Engineering Task Force, RFC 9106, Sep. 2021.
 
 \bibitem{Holtrop2022LDPFUSE}
 \BIBentryALTinterwordspacing
@@ -109,5 +157,26 @@ S.~Holtrop, ``Linker-directive based file system in userspace: Introducing ldp
   fuse,'' Bachelor's thesis, Leiden University, 2022. [Online]. Available:
   \url{https://theses.liacs.nl/pdf/2021-2022-HoltropS.pdf}
 \BIBentrySTDinterwordspacing
+
+\bibitem{Shazhaq2023Analisa}
+T.~S. Shazhaq, M.~Tahir, K.~Abidin, V.~Auria, D.~Maulidia, D.~F. Mu'in, and
+  M.~Khoiruddin, ``Analisa penyandian file dokumen kriptografi menggunakan
+  advanced encryption standard (aes),'' \emph{Jurnal Kendali Teknik dan Sains},
+  2023.
+
+\bibitem{YanDefuse}
+W.~Yan, J.~Yao, and Q.~Cao, ``Defuse: Decoupling metadata and data processing
+  in fuse framework for performance improvement,'' \emph{IEEE Access}, vol.~7,
+  pp. 138\,473--138\,484, 2019.
+
+\bibitem{NIST197upd1}
+{National Institute of Standards and Technology}, ``Advanced encryption
+  standard ({AES}),'' National Institute of Standards and Technology, Federal
+  Information Processing Standards Publication 197, Updated, May 2023.
+
+\bibitem{NIST80038D}
+M.~Dworkin, ``Recommendation for block cipher modes of operation:
+  Galois/counter mode ({GCM}) and {GMAC},'' National Institute of Standards and
+  Technology, NIST Special Publication 800-38D, Nov. 2007.
 
 \end{thebibliography}
